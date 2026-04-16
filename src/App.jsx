@@ -207,7 +207,7 @@ var I={
 function t(k,l){return(I[k]&&I[k][l])||I[k].sk||k;}
 
 /* Brand */
-var LT={bg:"#ECEDED",card:"#FFFFFF",text:"#4D4D4D",dim:"#989FA7",border:"#d6d8da",bl:"#f0f0f0",input:"#f7f7f8",red:"#AB0534",blue:"#003049",yellow:"#FFF3B0",lblue:"#C1DAE7",lgreen:"#CBD9C4",hbg:"#FFFFFF",secMust:"#AB0534",secNice:"#003049",secSub:"#f5f5f6",totBg:"#FFFFFF",totBdr:"#AB0534"};
+var LT={bg:"#ECEDED",card:"#FFFFFF",text:"#4D4D4D",dim:"#989FA7",border:"#d6d8da",bl:"#f0f0f0",input:"#f7f7f8",red:"#AB0534",blue:"#003049",yellow:"#FFF3B0",lblue:"#C1DAE7",lgreen:"#CBD9C4",hbg:"#FFFFFF",secMust:"#AB0534",secNice:"#4D4D4D",secSub:"#f5f5f6",totBg:"#FFFFFF",totBdr:"#AB0534"};
 var DK={bg:"#111111",card:"#1A1A1A",text:"#ededed",dim:"#989FA7",border:"#4D4D4D",bl:"#2A2A2A",input:"#111111",red:"#AB0534",blue:"#ededed",yellow:"#2a2500",lblue:"#2A2A2A",lgreen:"#222a22",hbg:"#1A1A1A",secMust:"#AB0534",secNice:"#2A2A2A",secSub:"#2A2A2A",totBg:"#1A1A1A",totBdr:"#AB0534"};
 
 var G5="1.3fr 105px 105px 50px 90px";var MN="Arial,monospace";
@@ -485,7 +485,7 @@ export default function App(){
               </div>
             </div>
             <div style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
-              <div style={{padding:"7px 14px",background:dark?"#0a2a3a":T.lblue}}><span style={{fontSize:11,fontWeight:700,color:dark?T.text:T.blue}}>{tx("remaining")}</span></div>
+              <div style={{padding:"7px 14px",background:dark?T.secSub:T.lblue}}><span style={{fontSize:11,fontWeight:700,color:dark?T.text:T.blue}}>{tx("remaining")}</span></div>
               <div style={{padding:"8px 14px"}}>
                 {[{k:"dis50",v:calc.d50.repl},{k:"dis70",v:calc.d70.repl},{k:"dis90",v:calc.d90.repl},{k:"pension",v:calc.pen.repl}].map(function(r,i){
                   return <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid "+T.bl}}>
@@ -507,7 +507,7 @@ export default function App(){
         {tab==="invest"&&(<div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:8}}>
             <div style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
-              <div style={{padding:"7px 14px",background:dark?"#0a2a3a":T.lblue}}><span style={{fontSize:11,fontWeight:700,color:dark?T.text:T.blue}}>{tx("investPart")}</span></div>
+              <div style={{padding:"7px 14px",background:dark?T.secSub:T.lblue}}><span style={{fontSize:11,fontWeight:700,color:dark?T.text:T.blue}}>{tx("investPart")}</span></div>
               <div style={{padding:"8px 14px"}}>
                 {[{l:tx("neededSav"),v:fmt(Math.round(calc.needed))+" \u20ac",c:T.text},{l:tx("savML"),v:fmt(Math.round(calc.ulSavings))+" \u20ac",c:T.text},{l:"PI "+tx("goal")+" ("+tx("colSugg")+")",v:fmt(Math.round(calc.piTarget))+" \u20ac",c:T.red},{l:tx("monthlyDep")+" ("+tx("colSugg")+")",v:fmt(mPI,2)+" \u20ac",c:T.dim},{l:tx("monthlyDep")+" ("+tx("realSum")+")",v:fmt(piReal,2)+" \u20ac",c:T.red},{l:tx("estYield"),v:iy+" %",c:T.text},{l:tx("investDur"),v:dur+" "+tx("years"),c:T.text},{l:tx("totalDep"),v:fmt(Math.round(piReal*dur*12))+" \u20ac",c:T.dim}].map(function(r,i){
                   return <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"4px 0",borderBottom:"1px solid "+T.bl}}>
