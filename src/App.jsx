@@ -208,7 +208,7 @@ function t(k,l){return(I[k]&&I[k][l])||I[k].sk||k;}
 
 /* Brand */
 var LT={bg:"#ECEDED",card:"#FFFFFF",text:"#4D4D4D",dim:"#989FA7",border:"#d6d8da",bl:"#f0f0f0",input:"#f7f7f8",red:"#AB0534",blue:"#003049",yellow:"#FFF3B0",lblue:"#C1DAE7",lgreen:"#CBD9C4",hbg:"#FFFFFF",secMust:"#AB0534",secNice:"#003049",secSub:"#f5f5f6",totBg:"#FFFFFF",totBdr:"#AB0534"};
-var DK={bg:"#111111",card:"#1A1A1A",text:"#ededed",dim:"#989FA7",border:"#4D4D4D",bl:"#2A2A2A",input:"#111111",red:"#AB0534",blue:"#ededed",yellow:"#2a2500",lblue:"#2A2A2A",lgreen:"#222a22",hbg:"#1A1A1A",secMust:"#AB0534",secNice:"#1a2a3a",secSub:"#2A2A2A",totBg:"#1A1A1A",totBdr:"#AB0534"};
+var DK={bg:"#111111",card:"#1A1A1A",text:"#ededed",dim:"#989FA7",border:"#4D4D4D",bl:"#2A2A2A",input:"#111111",red:"#AB0534",blue:"#ededed",yellow:"#2a2500",lblue:"#2A2A2A",lgreen:"#222a22",hbg:"#1A1A1A",secMust:"#AB0534",secNice:"#2A2A2A",secSub:"#2A2A2A",totBg:"#1A1A1A",totBdr:"#AB0534"};
 
 var G5="1.3fr 105px 105px 50px 90px";var MN="Arial,monospace";
 function mL(T){return{fontSize:9,fontWeight:600,color:T.dim,textTransform:"uppercase",letterSpacing:"0.04em",fontFamily:"Arial,sans-serif"};}
