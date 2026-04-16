@@ -208,7 +208,7 @@ function t(k,l){return(I[k]&&I[k][l])||I[k].sk||k;}
 
 /* Brand */
 var LT={bg:"#ECEDED",card:"#FFFFFF",text:"#4D4D4D",dim:"#989FA7",border:"#d6d8da",bl:"#f0f0f0",input:"#f7f7f8",red:"#AB0534",blue:"#003049",yellow:"#FFF3B0",lblue:"#C1DAE7",lgreen:"#CBD9C4",hbg:"#FFFFFF",secMust:"#AB0534",secNice:"#003049",secSub:"#f5f5f6",totBg:"#FFFFFF",totBdr:"#AB0534"};
-var DK={bg:"#111111",card:"#1A1A1A",text:"#ededed",dim:"#989FA7",border:"#4D4D4D",bl:"#2A2A2A",input:"#111111",red:"#AB0534",blue:"#C1DAE7",yellow:"#332a00",lblue:"#1a2a35",lgreen:"#1a2a1a",hbg:"#1A1A1A",secMust:"#AB0534",secNice:"#003049",secSub:"#2A2A2A",totBg:"#1A1A1A",totBdr:"#AB0534"};
+var DK={bg:"#111111",card:"#1A1A1A",text:"#ededed",dim:"#989FA7",border:"#4D4D4D",bl:"#2A2A2A",input:"#111111",red:"#AB0534",blue:"#ededed",yellow:"#2a2500",lblue:"#2A2A2A",lgreen:"#222a22",hbg:"#1A1A1A",secMust:"#AB0534",secNice:"#1a2a3a",secSub:"#2A2A2A",totBg:"#1A1A1A",totBdr:"#AB0534"};
 
 var G5="1.3fr 105px 105px 50px 90px";var MN="Arial,monospace";
 function mL(T){return{fontSize:9,fontWeight:600,color:T.dim,textTransform:"uppercase",letterSpacing:"0.04em",fontFamily:"Arial,sans-serif"};}
@@ -343,7 +343,7 @@ export default function App(){
 
         {/* TABS */}
         <div style={{display:"flex",marginBottom:12,background:T.card,borderRadius:8,overflow:"hidden",border:"1px solid "+T.border}}>
-          {[{id:"model",k:"tabModel"},{id:"overview",k:"tabOverview"},{id:"invest",k:"tabInvest"}].map(function(tb,i){var a=tab===tb.id;return <button key={tb.id} onClick={function(){sTab(tb.id);}} style={{flex:1,padding:"10px 4px",border:"none",cursor:"pointer",background:a?(dark?"#0a2a40":"#fdf0f2"):T.card,color:a?T.red:T.dim,fontSize:11,fontWeight:700,fontFamily:"Arial,sans-serif",borderBottom:a?"3px solid "+T.red:"3px solid transparent",borderRight:i<2?"1px solid "+T.border:"none"}}>{tx(tb.k)}</button>;})}
+          {[{id:"model",k:"tabModel"},{id:"overview",k:"tabOverview"},{id:"invest",k:"tabInvest"}].map(function(tb,i){var a=tab===tb.id;return <button key={tb.id} onClick={function(){sTab(tb.id);}} style={{flex:1,padding:"10px 4px",border:"none",cursor:"pointer",background:a?(dark?T.secSub:"#fdf0f2"):T.card,color:a?T.red:T.dim,fontSize:11,fontWeight:700,fontFamily:"Arial,sans-serif",borderBottom:a?"3px solid "+T.red:"3px solid transparent",borderRight:i<2?"1px solid "+T.border:"none"}}>{tx(tb.k)}</button>;})}
         </div>
 
         {/* MODEL */}
@@ -475,7 +475,7 @@ export default function App(){
         {tab==="overview"&&(<div>
           <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:8}}>
             <div style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
-              <div style={{padding:"7px 14px",background:dark?"#3a0a18":"#fdf0f2"}}><span style={{fontSize:11,fontWeight:700,color:T.red}}>{tx("incomeLoss")}</span></div>
+              <div style={{padding:"7px 14px",background:dark?"#2a1015":"#fdf0f2"}}><span style={{fontSize:11,fontWeight:700,color:T.red}}>{tx("incomeLoss")}</span></div>
               <div style={{padding:"8px 14px"}}>
                 {[{k:"dis50",v:calc.d50},{k:"dis70",v:calc.d70},{k:"dis90",v:calc.d90},{k:"pension",v:calc.pen}].map(function(r,i){
                   return <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 0",borderBottom:"1px solid "+T.bl}}>
@@ -520,7 +520,7 @@ export default function App(){
               </div>
             </div>
             <div style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
-              <div style={{padding:"7px 14px",background:dark?"#1a0a28":T.lgreen}}><span style={{fontSize:11,fontWeight:700,color:dark?T.text:T.blue}}>{tx("futureVal")}</span></div>
+              <div style={{padding:"7px 14px",background:dark?T.secSub:T.lgreen}}><span style={{fontSize:11,fontWeight:700,color:dark?T.text:T.blue}}>{tx("futureVal")}</span></div>
               <div style={{padding:"8px 14px"}}>
                 {[4,6,7,8,10].map(function(r){var val=fvDaily(piReal,r/100,dur);var a=r===iy;
                   return <div key={r} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 0",borderBottom:"1px solid "+T.bl}}>
