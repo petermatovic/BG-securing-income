@@ -1,0 +1,556 @@
+import { useState, useMemo } from "react";
+
+/* Rate tables */
+var DIS_R={18:2.82,19:2.94,20:2.94,21:3.06,22:3.06,23:3.18,24:3.18,25:3.3,26:3.3,27:3.43,28:3.55,29:3.67,30:3.79,31:3.92,32:4.04,33:4.16,34:4.41,35:4.53,36:4.77,37:5.02,38:5.26,39:5.51,40:5.75,41:6,42:6.24,43:6.61,44:6.98,45:7.34,46:7.71,47:8.2,48:8.57,49:9.18,50:9.67,51:10.28,52:10.89,53:11.51,54:12.12,55:12.85,56:13.71,57:14.57,58:15.67,59:16.65,60:18.12,61:18.6,62:19.34,63:20.2,64:21.42,65:23.75};
+var CI_R={18:4.43,19:4.57,20:4.71,21:4.85,22:4.99,23:5.14,24:5.3,25:5.47,26:5.64,27:5.84,28:6.03,29:6.24,30:6.46,31:6.7,32:6.95,33:7.22,34:7.5,35:7.81,36:8.14,37:8.51,38:8.89,39:9.3,40:9.74,41:10.21,42:10.71,43:11.24,44:11.8,45:12.39,46:13.01,47:13.66,48:14.35,49:15.07,50:15.85,51:16.65,52:17.52,53:18.45,54:19.5,55:20.69,56:21.59,57:22.77,58:24.05,59:25.57,60:27.37};
+var CA_R={18:3.84,19:3.97,20:4.09,21:4.21,22:4.33,23:4.46,24:4.6,25:4.74,26:4.9,27:5.06,28:5.23,29:5.4,30:5.59,31:5.79,32:6.01,33:6.24,34:6.49,35:6.74,36:7.04,37:7.34,38:7.67,39:8.03,40:8.41,41:8.81,42:9.23,43:9.68,44:10.17,45:10.67,46:11.2,47:11.76,48:12.34,49:12.96,50:13.62,51:14.31,52:15.06,53:15.85,54:16.73,55:17.74,56:18.53,57:19.54,58:20.59,59:21.89,60:23.43};
+var IN_R={18:4.55,19:4.61,20:4.70,21:4.77,22:4.87,23:4.98,24:5.09,25:5.21,26:5.34,27:5.47,28:5.63,29:5.79,30:5.95,31:6.12,32:6.30,33:6.50,34:6.72,35:6.95,36:7.18,37:7.45,38:7.74,39:8.04,40:8.35,41:8.65,42:8.96,43:9.25,44:9.55,45:9.87,46:10.24,47:10.66,48:11.11,49:11.60,50:12.15,51:12.78,52:13.44,53:14.15,54:14.90,55:15.84,56:16.71,57:17.80,58:19.01,59:20.51,60:22.31};
+var DD={15:{5:13.26,10:13.26,15:13.26,20:13.26,25:13.26,30:13.26},20:{5:15.3,10:15.3,15:15.3,20:15.3,25:15.3,30:15.3},25:{5:15.3,10:15.3,15:15.3,20:15.3,25:15.3,30:15.3},30:{5:15.3,10:15.3,15:15.3,20:16.32,25:17.34,30:19.38},35:{5:18.36,10:18.36,15:20.4,20:22.44,25:24.48,30:27.54},40:{5:25.5,10:26.52,15:29.58,20:31.62,25:35.7,30:40.8},45:{5:35.7,10:39.78,15:44.88,20:48.96,25:54.06},50:{5:55.08,10:61.2,15:67.32,20:73.44},55:{5:79.56,10:90.78,15:100.98},60:{5:122.4,10:139.74}};
+var DOT={15:{5:10.2,10:10.2,15:10.2,20:10.2,25:10.2,30:10.2},20:{5:12.24,10:12.24,15:12.24,20:12.24,25:12.24,30:12.24},25:{5:12.24,10:12.24,15:12.24,20:12.24,25:12.24,30:13.26},30:{5:13.26,10:13.26,15:13.26,20:13.26,25:14.28,30:15.3},35:{5:15.3,10:15.3,15:16.32,20:17.34,25:19.38,30:20.4},40:{5:20.4,10:20.4,15:22.44,20:24.48,25:26.52,30:28.56},45:{5:27.54,10:29.58,15:32.64,20:34.68,25:37.74,30:40.8},50:{5:38.76,10:41.82,15:45.9,20:48.96,25:53.04,30:58.14},55:{5:53.04,10:58.14,15:64.26,20:69.36,25:74.46},60:{5:76.5,10:84.66,15:91.8,20:98.94}};
+var RCT={1:{acc:1.5,pi:1.5,frac:16},2:{acc:2.5,pi:2.5,frac:20},3:{acc:4,pi:4,frac:27}};
+var WRT={1:0.043799,2:0.0525,3:0.07};
+var KCH5={18:1.4,25:1.4,26:2.35,30:2.35,31:4.63,35:4.63,36:7.24,40:7.24,41:12.31,45:12.31,46:20.45,50:20.45,51:31.79,55:31.79,56:46.34,60:46.34};
+var KCH10={18:1.85,25:1.85,26:3.19,30:3.19,31:6.23,35:6.23,36:9.57,40:9.57,41:16,45:16,46:25.47,50:25.47,51:38.07,55:38.07};
+
+/* CARE plan presets: [DIS, PD, CI, Cancer, InSitu, telemedicine] */
+var CARE_PLANS={
+  "Bronze plan":[10000,10000,10000,10000,5000,true],
+  "Silver plan":[25000,25000,25000,25000,12500,true],
+  "Gold plan":[50000,50000,50000,50000,25000,true],
+  "Platinum plan":[100000,100000,100000,100000,50000,true],
+  "not included":[0,0,0,0,0,false]
+};
+
+/* Pension replacement brackets from Excel */
+var PEN_MIN_BR=516.8138335;var PEN_MAX_BR=1738.392396;
+var PEN_MIN_REP=238.7733085;var PEN_MAX_REP=1022.5837624;var PEN_COEF=0.462;
+
+function lr(t,a,d){var as=Object.keys(t).map(Number).sort(function(x,y){return x-y});var ds=[5,10,15,20,25,30,35,80];var ca=as[0];for(var i=0;i<as.length;i++){if(as[i]<=a)ca=as[i];}var cd=ds[0];for(var j=0;j<ds.length;j++){if(ds[j]<=d)cd=ds[j];}return(t[ca]&&t[ca][cd])||15;}
+function fmt(n,d){if(d===undefined)d=0;if(n===null||n===undefined||isNaN(n)||!isFinite(n))return"\u2014";return new Intl.NumberFormat("sk-SK",{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);}
+function safe(x){return(x!==null&&x!==undefined&&isFinite(x))?x:0;}
+
+/* PV of annuity: how much capital needed to pay 'pmt' monthly for 'n' months at rate 'r'/month */
+function pvAnnuity(r,n){r=Number(r)||0;n=Number(n)||0;if(n<=0)return 0;if(r===0)return n;return(1-Math.pow(1+r,-n))/r;}
+
+/* Monthly savings needed to reach target FV (monthly compounding, consistent with fvAnnuity) */
+function monthlySavings(target,annualRate,years){
+  target=Number(target)||0;annualRate=Number(annualRate)||0;years=Number(years)||0;
+  if(target<=0||years<=0)return 0;
+  var mr=annualRate/12;var n=years*12;
+  if(mr===0)return target/n;
+  var factor=(Math.pow(1+mr,n)-1)/mr;
+  if(!isFinite(factor)||factor<=0)return 0;
+  return target/factor;
+}
+
+/* FV of annuity */
+function fvAnnuity(pmt,r,n){pmt=Number(pmt)||0;r=Number(r)||0;n=Number(n)||0;if(n<=0)return 0;if(r===0)return pmt*n;var x=pmt*((Math.pow(1+r,n)-1)/r);return isFinite(x)?x:0;}
+
+/* FV with daily compounding (matches monthlySavings formula from Excel) */
+function fvDaily(pmt,annualRate,years){
+  pmt=Number(pmt)||0;annualRate=Number(annualRate)||0;years=Number(years)||0;
+  if(pmt===0||years<=0)return 0;
+  if(annualRate===0)return pmt*years*12;
+  var dr=annualRate/360;var nd=years*360;var mr=annualRate/12;
+  var factor=(1-Math.pow(1+dr,nd))/mr;
+  if(!isFinite(factor)||factor===0)return 0;
+  return -pmt*factor;
+}
+
+/* UL cash value table per 300€/year (from Hárok1 projection) - scales proportionally for different UL amounts */
+var UL_TABLE={1:0,2:0,3:237.69,4:466.3,5:774.72,6:1169.85,7:1659.13,8:2250.63,9:2952.6,10:3430.98,11:3970.98,12:4542.62,13:5147.76,14:5788.35,15:6466.49,16:7184.36,17:7944.29,18:8748.76,19:9600.37,20:10501.87,21:11422.61,22:12397.31,23:13429.12,24:14521.38,25:15677.66,26:16901.68,27:18197.43,28:19569.11,29:21021.17,30:22558.31,31:24185.52,32:25908.08,33:27731.58,34:29661.93,35:31705.39,36:33868.59,37:36158.55,38:38582.69,39:41148.88,40:43865.44};
+function ulLookup(years,yearlyPremium){
+  var baseYearly=300;/* table is for 300€/year */
+  var yr=Math.round(Math.max(1,Math.min(years,40)));
+  var base=UL_TABLE[yr]||0;
+  return base*(yearlyPremium/baseYearly);
+}
+
+function penRepl(brutto){
+  if(brutto<=PEN_MIN_BR)return PEN_MIN_REP;
+  if(brutto>=PEN_MAX_BR)return PEN_MAX_REP;
+  return brutto*PEN_COEF;
+}
+
+function calcAll(br,ne,age,dur,iy,py,pyr,st,loan,ulOn,ulMonthly,cgOn,cgDD,cgInsured,carePlan,cgDur){
+  br=Number(br)||0;ne=Number(ne)||0;dur=Math.max(Number(dur)||1,1);
+  iy=Number(iy)||0;py=Number(py)||0;pyr=Number(pyr)||0;
+  var pr=penRepl(br);
+  /* gap = shortfall you need to cover, repl = what social insurance gives */
+  var repl50=pr*0.85,repl70=pr*1.05,repl90=pr*1.15,replPen=pr;
+  var gap50=ne-repl50,gap70=ne-repl70,gap90=ne-repl90,gapPen=ne-replPen;
+  var pct50=ne>0?repl50/ne:0,pct70=ne>0?repl70/ne:0,pct90=ne>0?repl90/ne:0,pctPen=ne>0?replPen/ne:0;
+  var pvF=pvAnnuity(py/12,pyr*12);
+  var pvFd=pvAnnuity(py/12,dur*12);/* PV factor for duration (used in suggested sums) */
+  var needed=safe(pvF*gapPen);
+
+  /* UL savings from projection table */
+  var ulYearly=ulOn?Math.max(ulMonthly*12,300):0;
+  var ulSavings=ulOn?ulLookup(dur,ulYearly):0;
+
+  /* Embedded death */
+  var embDeath=0;
+  if(ulOn){
+    if(st==="SINGLE")embDeath=2500;
+    else if(age<=30)embDeath=ulYearly*30;
+    else if(age<=35)embDeath=ulYearly*20;
+    else if(age<=45)embDeath=ulYearly*15;
+    else if(age<=55)embDeath=ulYearly*10;
+    else embDeath=ulYearly*6;
+  }
+
+  /* Monthly PI savings */
+  var piTarget=safe(needed-ulSavings);
+  var monthlyPI=monthlySavings(piTarget,iy,dur);
+
+  /* CARE sums */
+  var cp=CARE_PLANS[carePlan]||CARE_PLANS["not included"];
+  var careDis=cp[0],carePD=cp[1],careCI=cp[2];
+
+  /* Suggested sums (use pvFd = duration-based PV, matching Excel M11) */
+  var sugCGDeath;
+  if(cgDD){sugCGDeath=safe(pvFd*gap70*1.5+loan-careDis-carePD);}
+  else if(st==="SINGLE"){sugCGDeath=4000;}
+  else{sugCGDeath=ne*12*5+loan;}
+
+  var sugULDeath;
+  if(st==="SINGLE")sugULDeath=4000;
+  else sugULDeath=safe(ne*12*5+loan-embDeath-(cgOn?cgInsured:0));
+
+  /* Perm dis: when CG has Death+Disability, simply netto*10; otherwise complex formula */
+  var sugPermDis;
+  if(cgDD){sugPermDis=ne*10;}
+  else{sugPermDis=safe(pvFd*gap70*1.5+loan-carePD-careDis);if(sugPermDis<0)sugPermDis=0;}
+
+  var sugCI=safe(ne*18+10000-careCI);
+  if(sugCI<0)sugCI=0;
+
+  return{
+    d50:{gap:safe(gap50),repl:safe(repl50),pct:safe(pct50)},
+    d70:{gap:safe(gap70),repl:safe(repl70),pct:safe(pct70)},
+    d90:{gap:safe(gap90),repl:safe(repl90),pct:safe(pct90)},
+    pen:{gap:safe(gapPen),repl:safe(replPen),pct:safe(pctPen)},
+    needed:needed,ulSavings:ulSavings,embDeath:embDeath,
+    monthlyPI:safe(monthlyPI),piTarget:safe(piTarget),
+    sugCGDeath:Math.max(0,Math.round(sugCGDeath)),
+    sugULDeath:Math.max(0,Math.round(sugULDeath)),
+    sugPermDis:Math.round(sugPermDis),sugCI:Math.round(sugCI),
+    ulYearly:ulYearly,pvF:pvF
+  };
+}
+
+/* i18n */
+var I={
+  title:{sk:"Kalkula\u010dka zabezpe\u010denia pr\u00edjmu",en:"Income Protection Calculator",bg:"\u041a\u0430\u043b\u043a\u0443\u043b\u0430\u0442\u043e\u0440 \u0437\u0430\u0437\u0438\u0442\u0430 \u043d\u0430 \u0434\u043e\u0445\u043e\u0434\u0430"},
+  inputs:{sk:"Vstupn\u00e9 \u00fadaje",en:"Input Data",bg:"\u0412\u0445\u043e\u0434\u043d\u0438 \u0434\u0430\u043d\u043d\u0438"},
+  brutto:{sk:"Pr\u00edjem brutto",en:"Gross income",bg:"\u0411\u0440\u0443\u0442\u043e \u0434\u043e\u0445\u043e\u0434"},netto:{sk:"Pr\u00edjem netto",en:"Net income",bg:"\u041d\u0435\u0442\u043e \u0434\u043e\u0445\u043e\u0434"},
+  age:{sk:"Vek",en:"Age",bg:"\u0412\u044a\u0437\u0440\u0430\u0441\u0442"},
+  invYield:{sk:"Predpokladan\u00fd v\u00fdnos invest\u00edcie",en:"Expected investment yield",bg:"\u041e\u0447\u0430\u043a\u0432\u0430\u043d \u0434\u043e\u0445\u043e\u0434 \u043e\u0442 \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u044f"},
+  penYield:{sk:"Predpokladan\u00fd v\u00fdnos penzie",en:"Expected pension yield",bg:"\u041e\u0447\u0430\u043a\u0432\u0430\u043d \u043f\u0435\u043d\u0441\u0438\u043e\u043d\u0435\u043d \u0434\u043e\u0445\u043e\u0434"},
+  penYears:{sk:"V\u00fdplata d\u00f4chodku v rokoch",en:"Pension payment in years",bg:"\u041f\u0435\u043d\u0441\u0438\u043e\u043d\u043d\u043e \u043f\u043b\u0430\u0449\u0430\u043d\u0435 \u0432 \u0433\u043e\u0434\u0438\u043d\u0438"},
+  status:{sk:"Status",en:"Status",bg:"\u0421\u0442\u0430\u0442\u0443\u0441"},single:{sk:"Jednotlivec",en:"Single",bg:"\u0421\u0430\u043c"},couple:{sk:"P\u00e1r",en:"Couple",bg:"\u0414\u0432\u043e\u0439\u043a\u0430"},
+  riskClass:{sk:"Rizikov\u00e1 trieda",en:"Risk class",bg:"\u0420\u0438\u0441\u043a\u043e\u0432 \u043a\u043b\u0430\u0441"},
+  low:{sk:"N\u00edzke",en:"Low",bg:"\u041d\u0438\u0441\u044a\u043a"},medium:{sk:"Stredn\u00e9",en:"Medium",bg:"\u0421\u0440\u0435\u0434\u0435\u043d"},high:{sk:"Vysok\u00e9",en:"High",bg:"\u0412\u0438\u0441\u043e\u043a"},
+  loan:{sk:"V\u00fd\u0161ka \u00faveru",en:"Loan amount",bg:"\u0420\u0430\u0437\u043c\u0435\u0440 \u043d\u0430 \u043a\u0440\u0435\u0434\u0438\u0442\u0430"},dur:{sk:"Doba poistenia",en:"Insurance duration",bg:"\u041f\u0435\u0440\u0438\u043e\u0434 \u043d\u0430 \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u043a\u0430"},
+  tabModel:{sk:"Model poistenia",en:"Insurance Model",bg:"\u041c\u043e\u0434\u0435\u043b \u043d\u0430 \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u043a\u0430"},
+  tabOverview:{sk:"Anal\u00fdza pr\u00edjmu",en:"Income Analysis",bg:"\u0410\u043d\u0430\u043b\u0438\u0437 \u043d\u0430 \u0434\u043e\u0445\u043e\u0434\u0430"},
+  tabInvest:{sk:"Invest\u00edcia",en:"Investment",bg:"\u0418\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u044f"},
+  mustHave:{sk:"Must have",en:"Must have",bg:"Must have"},niceHave:{sk:"Nice to have",en:"Nice to have",bg:"Nice to have"},
+  investPart:{sk:"Investi\u010dn\u00e1 \u010das\u0165 (PI)",en:"Investment part (PI)",bg:"\u0418\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u043e\u043d\u043d\u0430 \u0447\u0430\u0441\u0442 (PI)"},
+  addPI:{sk:"Doplni\u0165 do PI",en:"Add to PI",bg:"\u0414\u043e\u0431\u0430\u0432\u0438 PI"},
+  neededSav:{sk:"Potrebn\u00e9 \u00faspory",en:"Needed savings",bg:"\u041d\u0435\u043e\u0431\u0445\u043e\u0434\u0438\u043c\u0438 \u0441\u043f\u0435\u0441\u0442\u044f\u0432\u0430\u043d\u0438\u044f"},
+  realSum:{sk:"Re\u00e1lna suma",en:"Real sum",bg:"\u0420\u0435\u0430\u043b\u043d\u0430 \u0441\u0443\u043c\u0430"},
+  pension:{sk:"D\u00f4chodok",en:"Pension",bg:"\u041f\u0435\u043d\u0441\u0438\u044f"},month:{sk:"mesiac",en:"month",bg:"\u043c\u0435\u0441\u0435\u0446"},
+  activate:{sk:"Aktivova\u0165",en:"Activate",bg:"\u0410\u043a\u0442\u0438\u0432\u0438\u0440\u0430\u043d\u0435"},
+  deathOnly:{sk:"Death",en:"Death",bg:"Death"},deathDis:{sk:"Death + Disability",en:"Death + Disability",bg:"Death + Disability"},
+  death:{sk:"Smr\u0165",en:"Death",bg:"\u0421\u043c\u044a\u0440\u0442"},deathAndDis:{sk:"Smr\u0165 + Invalidita",en:"Death + Disability",bg:"\u0421\u043c\u044a\u0440\u0442 + \u0418\u043d\u0432\u0430\u043b\u0438\u0434\u043d\u043e\u0441\u0442"},
+  withUL:{sk:"S investi\u010dnou zlo\u017ekou (UL)",en:"With investment (UL)",bg:"\u0421 \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u043e\u043d\u043d\u0430 \u0447\u0430\u0441\u0442 (UL)"},
+  investUL:{sk:"Investi\u010dn\u00e1 zlo\u017eka UL",en:"Investment part UL",bg:"\u0418\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u043e\u043d\u043d\u0430 \u0447\u0430\u0441\u0442 UL"},
+  savML:{sk:"\u00daspory v Metlife",en:"Savings in Metlife",bg:"\u0421\u043f\u0435\u0441\u0442\u044f\u0432\u0430\u043d\u0438\u044f \u0432 Metlife"},
+  embDeath:{sk:"Embedded death",en:"Embedded death",bg:"Embedded death"},
+  carePlan:{sk:"CARE bal\u00edk",en:"CARE plan",bg:"CARE \u043f\u043b\u0430\u043d"},
+  disTEMC:{sk:"Invalidita chorobou alebo \u00farazom min 51%",en:"Disability due to illness or accident min 51%",bg:"\u0418\u043d\u0432\u0430\u043b\u0438\u0434\u043d\u043e\u0441\u0442 \u043e\u0442 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0435 \u0438\u043b\u0438 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430 min 51%"},
+  permDis:{sk:"Trval\u00e1 invalidita \u00farazom",en:"Permanent disability from accident",bg:"\u0422\u0440\u0430\u0439\u043d\u0430 \u0438\u043d\u0432\u0430\u043b\u0438\u0434\u043d\u043e\u0441\u0442 \u043e\u0442 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430"},
+  ci40:{sk:"40 kritick\u00fdch chor\u00f4b",en:"40 critical illnesses",bg:"40 \u043a\u0440\u0438\u0442\u0438\u0447\u043d\u0438 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0438\u044f"},
+  cancer:{sk:"Rakovina",en:"Cancer",bg:"\u0420\u0430\u043a"},insitu:{sk:"Carcin\u00f3m in situ",en:"Carcinoma in situ",bg:"\u041a\u0430\u0440\u0446\u0438\u043d\u043e\u043c in situ"},
+  teleCare:{sk:"Telemedicna",en:"Telemedicine",bg:"\u0422\u0435\u043b\u0435\u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0430"},
+  accDeath:{sk:"\u00darazov\u00e1 smr\u0165",en:"Accidental death",bg:"\u0421\u043c\u044a\u0440\u0442 \u043e\u0442 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430"},
+  permCons:{sk:"Trval\u00e9 n\u00e1sledky \u00farazu",en:"Permanent consequences of accident",bg:"\u0422\u0440\u0430\u0439\u043d\u0438 \u043f\u043e\u0441\u043b\u0435\u0434\u0438\u0446\u0438 \u043e\u0442 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430"},
+  critIll:{sk:"Kritick\u00e9 choroby",en:"Critical illness",bg:"\u041a\u0440\u0438\u0442\u0438\u0447\u043d\u0438 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0438\u044f"},
+  hospital:{sk:"Hospital cash",en:"Hospital cash",bg:"Hospital cash"},surgical:{sk:"Surgical",en:"Surgical",bg:"Surgical"},
+  fractures:{sk:"Zlomeniny a pop\u00e1leniny",en:"Fractures and burns",bg:"\u0421\u0447\u0443\u043f\u0432\u0430\u043d\u0438\u044f \u0438 \u0438\u0437\u0433\u0430\u0440\u044f\u043d\u0438\u044f"},
+  telemed:{sk:"Telemedic\u00edna",en:"Telemedicine",bg:"\u0422\u0435\u043b\u0435\u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0430"},
+  waiver:{sk:"Waiver",en:"Waiver",bg:"Waiver"},
+  totalYearly:{sk:"Celkov\u00e9 ro\u010dn\u00e9 poistn\u00e9",en:"Total yearly premium",bg:"\u041e\u0431\u0449\u0430 \u0433\u043e\u0434\u0438\u0448\u043d\u0430 \u043f\u0440\u0435\u043c\u0438\u044f"},
+  riskPart:{sk:"Rizikov\u00e1 \u010das\u0165",en:"Risk part",bg:"\u0420\u0438\u0441\u043a\u043e\u0432\u0430 \u0447\u0430\u0441\u0442"},
+  investInc:{sk:"Investi\u010dn\u00e1 \u010das\u0165 z pr\u00edjmu",en:"Investment part of income",bg:"\u0418\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u043e\u043d\u043d\u0430 \u0447\u0430\u0441\u0442 \u043e\u0442 \u0434\u043e\u0445\u043e\u0434\u0430"},riskInc:{sk:"Rizikov\u00e1 \u010das\u0165 z pr\u00edjmu",en:"Risk part of income",bg:"\u0420\u0438\u0441\u043a\u043e\u0432\u0430 \u0447\u0430\u0441\u0442 \u043e\u0442 \u0434\u043e\u0445\u043e\u0434\u0430"},
+  incomeLoss:{sk:"Strata pr\u00edjmu",en:"Income loss",bg:"\u0417\u0430\u0433\u0443\u0431\u0430 \u043d\u0430 \u0434\u043e\u0445\u043e\u0434"},
+  remaining:{sk:"Zost\u00e1vaj\u00faci pr\u00edjem",en:"Remaining income",bg:"\u041e\u0441\u0442\u0430\u0432\u0430\u0449 \u0434\u043e\u0445\u043e\u0434"},
+  dis50:{sk:"Invalidita 50%",en:"Disability 50%",bg:"\u0418\u043d\u0432\u0430\u043b\u0438\u0434\u043d\u043e\u0441\u0442 50%"},dis70:{sk:"Invalidita 70%",en:"Disability 70%",bg:"\u0418\u043d\u0432\u0430\u043b\u0438\u0434\u043d\u043e\u0441\u0442 70%"},dis90:{sk:"Invalidita 90%",en:"Disability 90%",bg:"\u0418\u043d\u0432\u0430\u043b\u0438\u0434\u043d\u043e\u0441\u0442 90%"},
+  netIncome:{sk:"Netto pr\u00edjem",en:"Net income",bg:"\u041d\u0435\u0442\u043e \u0434\u043e\u0445\u043e\u0434"},
+  monthlyDep:{sk:"Mesa\u010dn\u00fd vklad",en:"Monthly deposit",bg:"\u041c\u0435\u0441\u0435\u0447\u043d\u0430 \u0432\u043d\u043e\u0441\u043a\u0430"},
+  estYield:{sk:"Predpokladan\u00fd v\u00fdnos",en:"Expected yield",bg:"\u041e\u0447\u0430\u043a\u0432\u0430\u043d \u0434\u043e\u0445\u043e\u0434"},
+  investDur:{sk:"Doba investovania",en:"Investment period",bg:"\u041f\u0435\u0440\u0438\u043e\u0434 \u043d\u0430 \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u044f"},
+  totalDep:{sk:"Celkov\u00e9 vklady",en:"Total deposits",bg:"\u041e\u0431\u0449\u043e \u0432\u043d\u043e\u0441\u043a\u0438"},
+  appreciation:{sk:"Zhodnotenie",en:"Appreciation",bg:"\u041f\u0435\u0447\u0430\u043b\u0431\u0430"},
+  futureVal:{sk:"Bud\u00faca hodnota",en:"Future value",bg:"\u0411\u044a\u0434\u0435\u0449\u0430 \u0441\u0442\u043e\u0439\u043d\u043e\u0441\u0442"},
+  yearly:{sk:"ro\u010dne",en:"yearly",bg:"\u0433\u043e\u0434\u0438\u0448\u043d\u043e"},years:{sk:"rokov",en:"years",bg:"\u0433\u043e\u0434\u0438\u043d\u0438"},
+  yearlyOverview:{sk:"Ro\u010dn\u00fd preh\u013ead",en:"Yearly overview",bg:"\u0413\u043e\u0434\u0438\u0448\u0435\u043d \u043f\u0440\u0435\u0433\u043b\u0435\u0434"},
+  year:{sk:"Rok",en:"Year",bg:"\u0413\u043e\u0434\u0438\u043d\u0430"},depTotal:{sk:"Vklady",en:"Deposits",bg:"\u0412\u043d\u043e\u0441\u043a\u0438"},profit:{sk:"Zisk",en:"Profit",bg:"\u041f\u0435\u0447\u0430\u043b\u0431\u0430"},
+  goal:{sk:"Cie\u013e",en:"Goal",bg:"\u0426\u0435\u043b"},
+  colSugg:{sk:"Navrhovan\u00e1 suma",en:"Suggested sum",bg:"\u041f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0430 \u0441\u0443\u043c\u0430"},colSum:{sk:"Poistn\u00e1 suma",en:"Sum insured",bg:"\u0417\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u0430\u043d\u0430 \u0441\u0443\u043c\u0430"},colYrs:{sk:"Roky",en:"Years",bg:"\u0413\u043e\u0434\u0438\u043d\u0438"},colPrem:{sk:"Poistn\u00e9 za rok",en:"Premium per year",bg:"\u041f\u0440\u0435\u043c\u0438\u044f \u0437\u0430 \u0433\u043e\u0434\u0438\u043d\u0430"},
+  light:{sk:"Svetl\u00e1",en:"Light",bg:"\u0421\u0432\u0435\u0442\u043b\u0430"},dark:{sk:"Tmav\u00e1",en:"Dark",bg:"\u0422\u044a\u043c\u043d\u0430"},
+};
+function t(k,l){return(I[k]&&I[k][l])||I[k].sk||k;}
+
+/* Brand */
+var LT={bg:"#ECEDED",card:"#FFFFFF",text:"#4D4D4D",dim:"#989FA7",border:"#d6d8da",bl:"#f0f0f0",input:"#f7f7f8",red:"#AB0534",blue:"#003049",yellow:"#FFF3B0",lblue:"#C1DAE7",lgreen:"#CBD9C4",hbg:"#FFFFFF",secMust:"#AB0534",secNice:"#003049",secSub:"#f5f5f6",totBg:"#FFFFFF",totBdr:"#AB0534"};
+var DK={bg:"#001a2c",card:"#002640",text:"#ECEDED",dim:"#989FA7",border:"#0a3a58",bl:"#003049",input:"#001a2c",red:"#CD6D80",blue:"#003049",yellow:"#FFF3B0",lblue:"#C1DAE7",lgreen:"#CBD9C4",hbg:"#002640",secMust:"#AB0534",secNice:"#003049",secSub:"#003049",totBg:"#002640",totBdr:"#CD6D80"};
+
+var G5="1.3fr 105px 105px 50px 90px";var MN="Arial,monospace";
+function mL(T){return{fontSize:9,fontWeight:600,color:T.dim,textTransform:"uppercase",letterSpacing:"0.04em",fontFamily:"Arial,sans-serif"};}
+function mI(T){return{flex:1,background:"transparent",border:"none",outline:"none",fontSize:13,fontWeight:600,color:T.text,fontFamily:"Arial,sans-serif",width:"100%",textAlign:"right"};}
+function mW(T){return{display:"flex",alignItems:"center",gap:4,background:T.input,borderRadius:4,padding:"5px 7px",border:"1px solid "+T.border};}
+
+/* Components (OUTSIDE App) */
+function Inp(p){var T=p.T;return(<div style={{display:"flex",flexDirection:"column",gap:2}}>{p.l&&<label style={mL(T)}>{p.l}</label>}<div style={mW(T)}><input type="number" value={p.v} onChange={function(e){p.c(Number(e.target.value));}} min={p.mn||0} max={p.mx||9999999} step={p.st||1} style={mI(T)}/>{p.s&&<span style={{fontSize:10,color:T.dim,fontWeight:600}}>{p.s}</span>}</div></div>);}
+function Sel(p){var T=p.T;return(<div style={{display:"flex",flexDirection:"column",gap:2}}>{p.l&&<label style={mL(T)}>{p.l}</label>}<select value={p.v} onChange={function(e){p.c(e.target.value);}} style={{background:T.input,borderRadius:4,padding:"6px 7px",border:"1px solid "+T.border,fontSize:12,fontWeight:600,color:T.text,fontFamily:"Arial,sans-serif",cursor:"pointer",outline:"none"}}>{p.o.map(function(x){return <option key={x.v} value={x.v}>{x.l}</option>;})}</select></div>);}
+function Chk(p){var T=p.T;return(<label style={{display:"flex",alignItems:"center",gap:6,cursor:"pointer",fontSize:11,fontWeight:600,color:p.ch?T.text:T.dim,fontFamily:"Arial,sans-serif"}}><div onClick={function(){p.c(!p.ch);}} style={{width:16,height:16,borderRadius:3,border:p.ch?"2px solid "+T.red:"2px solid "+T.border,background:p.ch?T.red:"transparent",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>{p.ch&&<span style={{color:"#fff",fontSize:10,fontWeight:900}}>{"\u2713"}</span>}</div>{p.l}</label>);}
+function Sec(p){var T=p.T;var bgM={must:T.secMust,nice:T.secNice,sub:T.secSub};var txM={must:"#fff",nice:"#fff",sub:T.text};return(<div style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden",marginBottom:8}}><div style={{padding:"7px 14px",background:bgM[p.type]||T.secSub,display:"flex",alignItems:"center",justifyContent:"space-between"}}><span style={{fontSize:11,fontWeight:700,color:txM[p.type]||T.text,fontFamily:"Arial,sans-serif"}}>{p.t}</span>{p.badge!==undefined&&<span style={{fontSize:9,fontWeight:600,background:"rgba(255,255,255,0.2)",padding:"1px 7px",borderRadius:10,color:txM[p.type]||T.text}}>{p.badge}</span>}</div><div style={{padding:"8px 14px"}}>{p.children}</div></div>);}
+function CH(p){var T=p.T;return(<div style={{display:"grid",gridTemplateColumns:G5,gap:3,padding:"3px 0",borderBottom:"2px solid "+T.red,marginBottom:1}}>{["",t("colSugg",p.L),t("colSum",p.L),t("colYrs",p.L),t("colPrem",p.L)].map(function(h,i){return <div key={i} style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:i>0?"right":"left",fontFamily:"Arial,sans-serif"}}>{h}</div>;})}</div>);}
+function DR(p){var T=p.T;var w=mW(T),s={...mI(T),fontSize:11};return(<div style={{display:"grid",gridTemplateColumns:G5,gap:3,alignItems:"center",padding:"4px 0",borderBottom:"1px solid "+T.bl}}><div style={{fontWeight:p.b?700:500,color:p.b?T.text:T.dim,fontSize:p.b?11:10,fontFamily:"Arial,sans-serif"}}>{p.l}</div><div style={{textAlign:"right",fontSize:10,color:T.dim,fontFamily:MN}}>{p.sg!=null?fmt(p.sg)+" \u20ac":""}</div>{p.sc?(<div style={w}><input type="number" value={p.si||0} onChange={function(e){p.sc(Number(e.target.value));}} style={s}/><span style={{fontSize:8,color:T.dim}}>{"\u20ac"}</span></div>):(<div style={{textAlign:"right",fontSize:10,color:T.dim,fontFamily:MN}}>{p.si!=null?fmt(p.si)+" \u20ac":""}</div>)}{p.dc?(<div style={w}><input type="number" value={p.dur||0} onChange={function(e){p.dc(Number(e.target.value));}} min={1} max={80} style={s}/></div>):(<div style={{textAlign:"right",fontSize:10,color:T.dim,fontFamily:MN}}>{p.dur||""}</div>)}<div style={{textAlign:"right",fontSize:11,fontWeight:p.b?700:600,color:p.pr>0.005?T.red:T.dim,fontFamily:MN}}>{p.pr!=null?fmt(p.pr,2)+" \u20ac":""}</div></div>);}
+function NR(p){var T=p.T;var w=mW(T),s={...mI(T),fontSize:11};return(<div style={{display:"grid",gridTemplateColumns:G5,gap:3,alignItems:"center",padding:"4px 0",borderBottom:"1px solid "+T.bl}}><div style={{fontSize:10,color:T.dim}}>{p.l}{p.note?" ("+p.note+")":""}</div><div></div><div style={w}><input type="number" value={p.si} onChange={function(e){p.sc(Number(e.target.value));}} min={0} max={p.mx||9999} style={s}/><span style={{fontSize:8,color:T.dim}}>{"\u20ac"}</span></div><div></div><div style={{textAlign:"right",fontSize:11,fontWeight:600,color:p.pr>0.005?T.red:T.dim,fontFamily:MN}}>{fmt(p.pr,2)+" \u20ac"}</div></div>);}
+
+/* APP */
+export default function App(){
+  var _=useState;
+  var _d=_(false),dark=_d[0],setDark=_d[1];
+  var _l=_("sk"),lang=_l[0],setLang=_l[1];
+  var T=dark?DK:LT;var L=lang;function tx(k){return t(k,L);}
+
+  var _br=_(2550),br=_br[0],sBr=_br[1];var _ne=_(2000),ne=_ne[0],sNe=_ne[1];
+  var _age=_(25),age=_age[0],sAge=_age[1];var _iy=_(8),iy=_iy[0],sIy=_iy[1];
+  var _py=_(4),py=_py[0],sPy=_py[1];var _pyr=_(20),pyr=_pyr[0],sPyr=_pyr[1];
+  var _st=_("SINGLE"),st=_st[0],sSt=_st[1];var _rk=_(1),rk=_rk[0],sRk=_rk[1];
+  var _loan=_(0),loan=_loan[0],sLoan=_loan[1];var _dur=_(30),dur=_dur[0],sDur=_dur[1];
+
+  var _cg=_(true),cg=_cg[0],sCg=_cg[1];var _cgDD=_(true),cgDD=_cgDD[0],sCgDD=_cgDD[1];
+  var _cgS=_(241000),cgS=_cgS[0],sCgS=_cgS[1];var _cgD=_(30),cgD=_cgD[0],sCgD=_cgD[1];
+
+  var _ul=_(true),ul=_ul[0],sUl=_ul[1];var _ulM=_(25),ulM=_ulM[0],sUlM=_ulM[1];
+  var _ulDS=_(4000),ulDS=_ulDS[0],sUlDS=_ulDS[1];var _ulDur=_(30),ulDur=_ulDur[0],sUlDur=_ulDur[1];
+
+  var _cp=_("Silver plan"),cp=_cp[0],sCp=_cp[1];
+  var _cDiD=_(30),cDiD=_cDiD[0],sCDiD=_cDiD[1];
+
+  var _aDS=_(0),aDS=_aDS[0],sADS=_aDS[1];var _aDDur=_(30),aDDur=_aDDur[0],sADDur=_aDDur[1];
+  var _pDS=_(20000),pDS=_pDS[0],sPDS=_pDS[1];var _pDDur=_(30),pDDur=_pDDur[0],sPDDur=_pDDur[1];
+  var _ciS=_(0),ciS=_ciS[0],sCiS=_ciS[1];var _ciDur=_(5),ciDur=_ciDur[0],sCiDur=_ciDur[1];
+
+  var _hS=_(0),hS=_hS[0],sHS=_hS[1];var _sS=_(0),sS=_sS[0],sSS=_sS[1];var _fS=_(0),fS=_fS[0],sFS=_fS[1];
+  var _telOn=_(true),telOn=_telOn[0],sTelOn=_telOn[1];var _wavOn=_(true),wavOn=_wavOn[0],sWavOn=_wavOn[1];
+  var _piReal=_(93),piReal=_piReal[0],sPiReal=_piReal[1];
+  var _tab=_("model"),tab=_tab[0],sTab=_tab[1];
+
+  var rc=RCT[rk]||RCT[1];
+  var calc=useMemo(function(){return calcAll(br,ne,age,dur,iy/100,py/100,pyr,st,loan,ul,ulM,cg,cgDD,cgS,cp,cgD);},[br,ne,age,dur,iy,py,pyr,st,loan,ul,ulM,cg,cgDD,cgS,cp,cgD]);
+  var mPI=calc.monthlyPI;
+  var careVals=CARE_PLANS[cp]||CARE_PLANS["not included"];
+  var careActive=cp!=="not included";
+
+  /* Premiums */
+  var cgRate=lr(cgDD?DD:DOT,age,cgD);var cgPr=cg?(cgS/100000)*cgRate*12:0;
+  var ulYr=calc.ulYearly;
+  /* UL Death uses Rider table if UL on, Basic if off */
+  var ulDeathRate=ul?lr(DD,age,ulDur):0;
+  var ulDeathPr=ul?(ulDS/1000)*(ulDeathRate/100)*12:0;
+  /* Recalc: Excel F29 = VLOOKUP for rider rate * sum/1000 */
+  /* Actually the DD table values are per 100000. So: rate * sum/100000 * 12 */
+  ulDeathPr=ul?(ulDS/100000)*lr(DD,age,ulDur)*12:0;
+
+  var dR=DIS_R[age]||3.79,ciRR=CI_R[age]||6.46,caRR=CA_R[age]||5.59,inRR=IN_R[age]||5.95;
+  var cDisPr=careActive?careVals[0]/1000*dR:0;
+  var cPDPr=careActive?careVals[1]*rc.pi/1000:0;
+  var cCIPr=careActive?careVals[2]/1000*ciRR:0;
+  var cCaPr=careActive?careVals[3]/1000*caRR:0;
+  var cInPr=careActive?careVals[4]/1000*inRR:0;
+  var cTelPr=careVals[5]?15:0;
+
+  var aDPr=aDS*rc.acc/1000;var pDPr=pDS*rc.pi/1000;
+  var kR=ciDur<=5?(KCH5[age]||2.35):(KCH10[age]||3.19);
+  var ciPr=ul?(ciS/1000*ciRR):(ciS/10000*kR);
+  /* If UL is on, CI uses CARE rate. If off, uses standalone KCH rate */
+  ciPr=ul?(ciS/1000*ciRR):(ciS/10000*kR);
+
+  var hPr=hS*4.25;var sPr=sS*8.32/100;var fPr=fS*rc.frac/1000;
+  var telPr=telOn?15:0;
+
+  var riskSum=cgPr+ulDeathPr+cDisPr+cPDPr+cCIPr+cCaPr+cInPr+cTelPr+aDPr+pDPr+ciPr+hPr+sPr+fPr+telPr;
+  var wvPr=wavOn?safe(riskSum*WRT[rk]):0;
+  /* Fee: 15 if UL, 13 if not + 5 if CG */
+  var fee=(ul?15:13)+(cg?5:0);
+  var rP=riskSum+wvPr;
+  var tY=rP+fee+ulYr+piReal*12;
+  var investOnInc=ne>0?((ulYr+piReal*12)/12/ne):0;
+  var riskOnInc=ne>0?rP/(ne*12):0;
+
+  var btnS=function(a){return{padding:"3px 8px",borderRadius:4,border:"1px solid "+(a?"#AB0534":T.border),background:a?"#AB0534":"transparent",color:a?"#fff":T.dim,fontSize:9,fontWeight:700,cursor:"pointer",fontFamily:"Arial,sans-serif"};};
+
+  return(
+    <div style={{fontFamily:"Arial,Helvetica,sans-serif",background:T.bg,color:T.text,minHeight:"100vh"}}>
+      <div style={{borderTop:"4px solid #AB0534",background:T.hbg,padding:"12px 16px",borderBottom:"1px solid "+T.border}}>
+        <div style={{maxWidth:960,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
+          <div style={{display:"flex",alignItems:"center",gap:10}}>
+            <svg width="30" height="30" viewBox="0 0 30 30"><rect width="30" height="30" rx="4" fill="#AB0534"/><text x="15" y="21" textAnchor="middle" fontFamily="Arial" fontWeight="900" fontSize="18" fill="#fff">P</text></svg>
+            <div><div style={{fontSize:16,fontWeight:700,color:T.text,letterSpacing:"0.12em",textTransform:"uppercase"}}>P<span style={{color:"#AB0534"}}>A</span>RTNERS</div><div style={{fontSize:9,color:T.dim}}>{tx("title")+" \u2022 BG 3/2026"}</div></div>
+          </div>
+          <div style={{display:"flex",alignItems:"center",gap:6}}>
+            {["sk","en","bg"].map(function(lg){return <button key={lg} onClick={function(){setLang(lg);}} style={btnS(lang===lg)}>{lg.toUpperCase()}</button>;})}
+            <div style={{width:1,height:16,background:T.border,margin:"0 2px"}}></div>
+            <button onClick={function(){setDark(!dark);}} style={btnS(false)}>{dark?tx("light"):tx("dark")}</button>
+          </div>
+        </div>
+      </div>
+
+      <div style={{maxWidth:960,margin:"0 auto",padding:"14px 10px 40px"}}>
+        {/* INPUTS */}
+        <div style={{background:T.card,borderRadius:8,padding:"12px 14px",border:"1px solid "+T.border,marginBottom:10}}>
+          <div style={{...mL(T),color:T.red,marginBottom:8}}>{tx("inputs")}</div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:5}}>
+            <div style={{display:"flex",flexDirection:"column",gap:5}}>
+              <Inp T={T} l={tx("brutto")} v={br} c={sBr} s={"\u20ac"}/>
+              <Inp T={T} l={tx("netto")} v={ne} c={sNe} s={"\u20ac"}/>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:5}}>
+              <Inp T={T} l={tx("age")} v={age} c={sAge} s="r." mn={18} mx={65}/>
+              <Inp T={T} l={tx("dur")} v={dur} c={sDur} s="r." mn={1} mx={45}/>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:5}}>
+              <Sel T={T} l={tx("status")} v={st} c={sSt} o={[{v:"SINGLE",l:tx("single")},{v:"COUPLE",l:tx("couple")}]}/>
+              <Sel T={T} l={tx("riskClass")} v={String(rk)} c={function(v){sRk(Number(v));}} o={[{v:"1",l:"1 - "+tx("low")},{v:"2",l:"2 - "+tx("medium")},{v:"3",l:"3 - "+tx("high")}]}/>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:5}}>
+              <Inp T={T} l={tx("invYield")} v={iy} c={sIy} s="%" st={0.5}/>
+              <Inp T={T} l={tx("penYield")} v={py} c={sPy} s="%" st={0.5}/>
+            </div>
+            <div style={{display:"flex",flexDirection:"column",gap:5}}>
+              <Inp T={T} l={tx("penYears")} v={pyr} c={sPyr} s="r."/>
+              <Inp T={T} l={tx("loan")} v={loan} c={sLoan} s={"\u20ac"}/>
+            </div>
+          </div>
+        </div>
+
+        {/* TABS */}
+        <div style={{display:"flex",marginBottom:12,background:T.card,borderRadius:8,overflow:"hidden",border:"1px solid "+T.border}}>
+          {[{id:"model",k:"tabModel"},{id:"overview",k:"tabOverview"},{id:"invest",k:"tabInvest"}].map(function(tb,i){var a=tab===tb.id;return <button key={tb.id} onClick={function(){sTab(tb.id);}} style={{flex:1,padding:"10px 4px",border:"none",cursor:"pointer",background:a?(dark?"#0a2a40":"#fdf0f2"):T.card,color:a?T.red:T.dim,fontSize:11,fontWeight:700,fontFamily:"Arial,sans-serif",borderBottom:a?"3px solid "+T.red:"3px solid transparent",borderRight:i<2?"1px solid "+T.border:"none"}}>{tx(tb.k)}</button>;})}
+        </div>
+
+        {/* MODEL */}
+        {tab==="model"&&(<div>
+          <Sec T={T} t={tx("mustHave")} type="must">
+            <Sec T={T} t={tx("investPart")} type="sub">
+              {function(){
+                /* Compute real sum FV and pension */
+                var piRealFV=fvDaily(piReal,iy/100,dur);
+                var piRealTotal=piRealFV+(calc.ulSavings||0);
+                var pvF=calc.pvF||1;
+                var piRealPension=pvF>0?piRealTotal/pvF:0;
+                var piSugFV=calc.piTarget;
+                var piSugTotal=piSugFV+(calc.ulSavings||0);
+                var piSugPension=pvF>0?piSugTotal/pvF:0;
+                var w=mW(T),si={...mI(T),fontSize:12};
+                return(
+                  <div>
+                    {/* header */}
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 90px 90px 80px 80px",gap:4,padding:"3px 0",borderBottom:"2px solid "+T.red,marginBottom:2}}>
+                      <div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase"}}>PI</div>
+                      <div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("colSugg")}</div>
+                      <div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("realSum")}</div>
+                      <div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("pension")}</div>
+                      <div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("month")}</div>
+                    </div>
+                    {/* add in PI row */}
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 90px 90px 80px 80px",gap:4,alignItems:"center",padding:"5px 0",borderBottom:"1px solid "+T.bl}}>
+                      <div style={{fontSize:11,fontWeight:600,color:T.text}}>{tx("addPI")}</div>
+                      <div style={{textAlign:"right",fontSize:12,fontWeight:700,color:T.red,fontFamily:MN}}>{fmt(mPI,2)+" \u20ac"}</div>
+                      <div style={w}><input type="number" value={piReal} onChange={function(e){sPiReal(Number(e.target.value));}} min={0} style={si}/><span style={{fontSize:8,color:T.dim}}>{"\u20ac"}</span></div>
+                      <div style={{textAlign:"right",fontSize:12,fontWeight:700,color:"#22863a",fontFamily:MN}}>{fmt(Math.round(piRealPension))+" \u20ac"}</div>
+                      <div style={{textAlign:"right",fontSize:12,fontWeight:600,color:T.text,fontFamily:MN}}>{fmt(piReal,2)+" \u20ac"}</div>
+                    </div>
+                    {/* Sum row */}
+                    <div style={{display:"grid",gridTemplateColumns:"1fr 90px 90px 80px 80px",gap:4,alignItems:"center",padding:"5px 0"}}>
+                      <div style={{fontSize:11,fontWeight:600,color:T.text}}>Sum</div>
+                      <div style={{textAlign:"right",fontSize:12,fontWeight:700,color:T.text,fontFamily:MN}}>{fmt(Math.round(piSugFV))+" \u20ac"}</div>
+                      <div style={{textAlign:"right",fontSize:12,fontWeight:700,color:T.text,fontFamily:MN}}>{fmt(Math.round(piRealFV))+" \u20ac"}</div>
+                      <div></div>
+                      <div></div>
+                    </div>
+                  </div>
+                );
+              }()}
+            </Sec>
+
+            {/* Credit Guard */}
+            <Sec T={T} t="Metlife Credit Guard" type="sub">
+              <div style={{display:"flex",gap:14,alignItems:"center",marginBottom:8,flexWrap:"wrap"}}>
+                <Chk T={T} l={tx("activate")} ch={cg} c={sCg}/>
+                {cg&&<Sel T={T} v={cgDD?"dd":"d"} c={function(v){sCgDD(v==="dd");}} o={[{v:"d",l:tx("deathOnly")},{v:"dd",l:tx("deathDis")}]}/>}
+              </div>
+              {cg&&<div><CH T={T} L={L}/><DR T={T} l={cgDD?tx("deathAndDis"):tx("death")} sg={calc.sugCGDeath} si={cgS} sc={sCgS} dur={cgD} dc={sCgD} pr={cgPr} b={true}/></div>}
+            </Sec>
+
+            {/* Metlife UL */}
+            <Sec T={T} t="Metlife" type="sub" badge={ul?"WITH UL":"BEZ UL"}>
+              <div style={{marginBottom:8}}><Chk T={T} l={tx("withUL")} ch={ul} c={sUl}/></div>
+              {ul&&(<div>
+                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(110px,1fr))",gap:5,marginBottom:8,padding:"6px 8px",background:T.input,borderRadius:6,border:"1px solid "+T.border}}>
+                  <Inp T={T} l={tx("investUL")+" (min 25\u20ac)"} v={ulM} c={sUlM} s={"\u20ac/m"} mn={25}/>
+                  <div><div style={mL(T)}>{tx("savML")}</div><div style={{fontSize:12,fontWeight:700,color:T.text,fontFamily:MN,marginTop:4}}>{fmt(Math.round(calc.ulSavings))+" \u20ac"}</div></div>
+                  <div><div style={mL(T)}>{tx("embDeath")}</div><div style={{fontSize:12,fontWeight:700,color:T.dim,fontFamily:MN,marginTop:4}}>{fmt(Math.round(calc.embDeath))+" \u20ac"}</div></div>
+                </div>
+                <CH T={T} L={L}/><DR T={T} l={tx("death")} sg={calc.sugULDeath} si={ulDS} sc={sUlDS} dur={ulDur} dc={sUlDur} pr={ulDeathPr} b={true}/>
+              </div>)}
+            </Sec>
+
+            {/* CARE */}
+            <Sec T={T} t="Metlife CARE" type="sub" badge={careActive?cp:"not included"}>
+              <div style={{marginBottom:8}}>
+                <Sel T={T} l={tx("carePlan")} v={cp} c={sCp} o={Object.keys(CARE_PLANS).map(function(k){return{v:k,l:k};})}/>
+              </div>
+              {careActive&&(<div><CH T={T} L={L}/>
+                <DR T={T} l={tx("disTEMC")} si={careVals[0]} dur={cDiD} dc={sCDiD} pr={cDisPr}/>
+                <DR T={T} l={tx("permDis")} si={careVals[1]} dur={cDiD} pr={cPDPr}/>
+                <DR T={T} l={tx("ci40")} si={careVals[2]} pr={cCIPr}/>
+                <DR T={T} l={tx("cancer")} si={careVals[3]} pr={cCaPr}/>
+                <DR T={T} l={tx("insitu")} si={careVals[4]} pr={cInPr}/>
+                <div style={{padding:"4px 0",fontSize:10,color:careVals[5]?T.red:T.dim}}>{tx("teleCare")+": "+(careVals[5]?"Included":"not Included")}</div>
+              </div>)}
+            </Sec>
+
+            {/* Standalone */}
+            <CH T={T} L={L}/>
+            <DR T={T} l={tx("accDeath")} si={aDS} sc={sADS} dur={aDDur} dc={sADDur} pr={aDPr} b={true}/>
+            <DR T={T} l={tx("permCons")} sg={calc.sugPermDis} si={pDS} sc={sPDS} dur={pDDur} dc={sPDDur} pr={pDPr} b={true}/>
+            <DR T={T} l={tx("critIll")} sg={calc.sugCI} si={ciS} sc={sCiS} dur={ciDur} dc={sCiDur} pr={ciPr} b={true}/>
+          </Sec>
+
+          {/* Nice to have */}
+          <Sec T={T} t={tx("niceHave")} type="nice">
+            <NR T={T} l={tx("hospital")} note={"5-300\u20ac"} si={hS} sc={sHS} pr={hPr} mx={300}/>
+            <NR T={T} l={tx("surgical")} note={"150-5000\u20ac"} si={sS} sc={sSS} pr={sPr} mx={5000}/>
+            <NR T={T} l={tx("fractures")} note={"500-1500\u20ac"} si={fS} sc={sFS} pr={fPr} mx={1500}/>
+            <div style={{padding:"6px 0",display:"flex",gap:14,flexWrap:"wrap"}}>
+              <Chk T={T} l={tx("telemed")+" (+15\u20ac)"} ch={telOn} c={sTelOn}/>
+              <Chk T={T} l={tx("waiver")} ch={wavOn} c={sWavOn}/>
+            </div>
+            {wavOn&&(<div style={{display:"grid",gridTemplateColumns:G5,gap:3,alignItems:"center",padding:"4px 0",borderBottom:"1px solid "+T.bl}}>
+              <div style={{fontWeight:600,color:T.text,fontSize:11}}>{tx("waiver")}</div>
+              <div style={{textAlign:"right",fontSize:10,color:T.dim,fontFamily:MN}}>{fmt(riskSum+ulYr,2)+" \u20ac"}</div>
+              <div style={{textAlign:"right",fontSize:10,color:T.dim,fontFamily:MN}}>{fmt(riskSum+ulYr,2)+" \u20ac"}</div>
+              <div style={{textAlign:"center",fontSize:9,color:T.red,fontWeight:700}}>yes</div>
+              <div style={{textAlign:"right",fontSize:11,fontWeight:700,color:T.red,fontFamily:MN}}>{fmt(wvPr,2)+" \u20ac"}</div>
+            </div>)}
+            <div style={{display:"grid",gridTemplateColumns:G5,gap:3,alignItems:"center",padding:"4px 0"}}>
+              <div style={{fontSize:10,color:T.dim}}>Fee</div><div></div><div></div><div></div>
+              <div style={{textAlign:"right",fontSize:11,color:T.dim,fontFamily:MN}}>{fmt(fee,2)+" \u20ac"}</div>
+            </div>
+          </Sec>
+
+          {/* Totals */}
+          <div style={{background:T.totBg,borderRadius:8,padding:"14px 16px",border:"2px solid "+T.totBdr,position:"relative"}}>
+            <div style={{position:"absolute",top:-2,left:-2,width:24,height:24,borderTop:"3px solid "+T.totBdr,borderLeft:"3px solid "+T.totBdr,borderRadius:"8px 0 0 0"}}></div>
+            <div style={{position:"absolute",bottom:-2,right:-2,width:24,height:24,borderBottom:"3px solid "+T.totBdr,borderRight:"3px solid "+T.totBdr,borderRadius:"0 0 8px 0"}}></div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",padding:"2px 0"}}><span style={{fontSize:11,fontWeight:600,color:T.dim}}>{tx("totalYearly")}</span><span style={{fontSize:20,fontWeight:800,color:T.text,fontFamily:MN}}>{fmt(tY,2)+" \u20ac"}</span></div>
+            <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",padding:"2px 0"}}><span style={{fontSize:11,fontWeight:600,color:T.dim}}>{tx("riskPart")}</span><span style={{fontSize:14,fontWeight:700,color:T.red,fontFamily:MN}}>{fmt(rP,2)+" \u20ac"}</span></div>
+            <div style={{borderTop:"1px solid "+T.border,marginTop:8,paddingTop:8,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
+              <div><div style={{fontSize:8,color:T.dim,fontWeight:700,textTransform:"uppercase"}}>Risk part</div><div style={{fontSize:15,fontWeight:800,color:"#AB0534",fontFamily:MN}}>{tY>0?((rP/tY)*100).toFixed(0)+"%":"0%"}</div></div>
+              <div><div style={{fontSize:8,color:T.dim,fontWeight:700,textTransform:"uppercase"}}>{tx("investInc")}</div><div style={{fontSize:15,fontWeight:800,color:dark?T.text:T.blue,fontFamily:MN}}>{(investOnInc*100).toFixed(1)+"%"}</div></div>
+              <div><div style={{fontSize:8,color:T.dim,fontWeight:700,textTransform:"uppercase"}}>{tx("riskInc")}</div><div style={{fontSize:15,fontWeight:800,color:T.dim,fontFamily:MN}}>{(riskOnInc*100).toFixed(1)+"%"}</div></div>
+            </div>
+          </div>
+        </div>)}
+
+        {/* OVERVIEW */}
+        {tab==="overview"&&(<div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:8}}>
+            <div style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
+              <div style={{padding:"7px 14px",background:dark?"#3a0a18":"#fdf0f2"}}><span style={{fontSize:11,fontWeight:700,color:T.red}}>{tx("incomeLoss")}</span></div>
+              <div style={{padding:"8px 14px"}}>
+                {[{k:"dis50",v:calc.d50},{k:"dis70",v:calc.d70},{k:"dis90",v:calc.d90},{k:"pension",v:calc.pen}].map(function(r,i){
+                  return <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 0",borderBottom:"1px solid "+T.bl}}>
+                    <div><div style={{fontSize:10,color:T.dim}}>{tx(r.k)}</div><div style={{height:3,borderRadius:2,background:T.border,width:90,marginTop:2}}><div style={{height:"100%",borderRadius:2,background:T.red,width:Math.min((1-r.v.pct)*100,100)+"%"}}></div></div></div>
+                    <div style={{textAlign:"right"}}><div style={{fontSize:13,fontWeight:700,color:T.red,fontFamily:MN}}>{fmt(Math.round(r.v.gap))+" \u20ac"}</div><div style={{fontSize:8,color:T.dim}}>{((1-r.v.pct)*100).toFixed(0)+"%"}</div></div>
+                  </div>;})}
+              </div>
+            </div>
+            <div style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
+              <div style={{padding:"7px 14px",background:dark?"#0a2a3a":T.lblue}}><span style={{fontSize:11,fontWeight:700,color:dark?T.text:T.blue}}>{tx("remaining")}</span></div>
+              <div style={{padding:"8px 14px"}}>
+                {[{k:"dis50",v:calc.d50.repl},{k:"dis70",v:calc.d70.repl},{k:"dis90",v:calc.d90.repl},{k:"pension",v:calc.pen.repl}].map(function(r,i){
+                  return <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid "+T.bl}}>
+                    <span style={{fontSize:10,color:T.dim}}>{tx(r.k)}</span><span style={{fontSize:13,fontWeight:700,color:T.text,fontFamily:MN}}>{fmt(Math.round(r.v))+" \u20ac"}</span>
+                  </div>;})}
+                <div style={{marginTop:5,padding:"6px 8px",background:dark?T.bl:T.lblue,borderRadius:6,display:"flex",justifyContent:"space-between"}}>
+                  <span style={{fontSize:9,color:T.dim}}>{tx("netIncome")}</span><span style={{fontSize:14,fontWeight:800,color:T.red,fontFamily:MN}}>{fmt(ne)+" \u20ac"}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style={{marginTop:8,background:T.totBg,borderRadius:8,padding:"14px 16px",border:"2px solid "+T.totBdr,display:"flex",flexWrap:"wrap",gap:14,justifyContent:"space-between"}}>
+            <div><div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase"}}>{tx("neededSav")}</div><div style={{fontSize:24,fontWeight:800,color:T.red,fontFamily:MN}}>{fmt(Math.round(calc.needed))+" \u20ac"}</div></div>
+            <div style={{textAlign:"right"}}><div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase"}}>{tx("monthlyDep")}</div><div style={{fontSize:19,fontWeight:800,color:dark?T.text:T.blue,fontFamily:MN}}>{fmt(mPI,2)+" \u20ac"}</div><div style={{fontSize:9,color:T.dim}}>{iy+"% "+tx("yearly")+", "+dur+" "+tx("years")}</div></div>
+          </div>
+        </div>)}
+
+        {/* INVEST */}
+        {tab==="invest"&&(<div>
+          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:8}}>
+            <div style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
+              <div style={{padding:"7px 14px",background:dark?"#0a2a3a":T.lblue}}><span style={{fontSize:11,fontWeight:700,color:dark?T.text:T.blue}}>{tx("investPart")}</span></div>
+              <div style={{padding:"8px 14px"}}>
+                {[{l:tx("neededSav"),v:fmt(Math.round(calc.needed))+" \u20ac",c:T.text},{l:tx("savML"),v:fmt(Math.round(calc.ulSavings))+" \u20ac",c:T.text},{l:"PI "+tx("goal")+" ("+tx("colSugg")+")",v:fmt(Math.round(calc.piTarget))+" \u20ac",c:T.red},{l:tx("monthlyDep")+" ("+tx("colSugg")+")",v:fmt(mPI,2)+" \u20ac",c:T.dim},{l:tx("monthlyDep")+" ("+tx("realSum")+")",v:fmt(piReal,2)+" \u20ac",c:T.red},{l:tx("estYield"),v:iy+" %",c:T.text},{l:tx("investDur"),v:dur+" "+tx("years"),c:T.text},{l:tx("totalDep"),v:fmt(Math.round(piReal*dur*12))+" \u20ac",c:T.dim}].map(function(r,i){
+                  return <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"4px 0",borderBottom:"1px solid "+T.bl}}>
+                    <span style={{fontSize:10,color:T.dim}}>{r.l}</span><span style={{fontSize:12,fontWeight:700,color:r.c,fontFamily:MN}}>{r.v}</span>
+                  </div>;})}
+                <div style={{marginTop:6,padding:"6px 8px",background:dark?T.bl:T.yellow,borderRadius:6}}>
+                  <div style={{fontSize:9,color:T.dim}}>{tx("appreciation")}</div>
+                  <div style={{fontSize:16,fontWeight:800,color:T.red,fontFamily:MN}}>+{fmt(Math.max(0,Math.round(fvDaily(piReal,iy/100,dur)-piReal*dur*12)))+" \u20ac"}</div>
+                </div>
+              </div>
+            </div>
+            <div style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
+              <div style={{padding:"7px 14px",background:dark?"#1a0a28":T.lgreen}}><span style={{fontSize:11,fontWeight:700,color:dark?T.text:T.blue}}>{tx("futureVal")}</span></div>
+              <div style={{padding:"8px 14px"}}>
+                {[4,6,7,8,10].map(function(r){var val=fvDaily(piReal,r/100,dur);var a=r===iy;
+                  return <div key={r} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 0",borderBottom:"1px solid "+T.bl}}>
+                    <span style={{fontSize:10,color:a?T.red:T.dim,fontWeight:a?700:500}}>{r+"% "+tx("yearly")}</span>
+                    <span style={{fontSize:12,fontWeight:a?800:600,color:a?T.red:T.text,fontFamily:MN}}>{fmt(Math.round(val))+" \u20ac"}</span>
+                  </div>;})}
+              </div>
+            </div>
+          </div>
+          <div style={{marginTop:8,background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
+            <div style={{padding:"7px 14px",background:T.secSub,borderBottom:"1px solid "+T.border}}><span style={{fontSize:11,fontWeight:700,color:T.text}}>{tx("yearlyOverview")}</span></div>
+            <div style={{padding:"8px 14px",overflowX:"auto"}}>
+              <table style={{width:"100%",borderCollapse:"collapse",fontSize:11}}>
+                <thead><tr style={{borderBottom:"2px solid "+T.red}}>
+                  {[tx("year"),tx("depTotal"),tx("futureVal")+" "+iy+"%",tx("profit")].map(function(h,i){return <th key={i} style={{padding:"4px 6px",textAlign:"right",fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase"}}>{h}</th>;})}
+                </tr></thead>
+                <tbody>{[1,2,3,5,7,10,15,20,25,30].filter(function(y){return y<=dur;}).map(function(yr){
+                  var dep=piReal*yr*12;var val=fvDaily(piReal,iy/100,yr);var p=val-dep;
+                  return <tr key={yr} style={{borderBottom:"1px solid "+T.bl}}>
+                    <td style={{padding:"3px 6px",textAlign:"right",fontWeight:700,color:T.text}}>{yr}</td>
+                    <td style={{padding:"3px 6px",textAlign:"right",fontFamily:"monospace",color:T.dim}}>{fmt(Math.round(dep))+" \u20ac"}</td>
+                    <td style={{padding:"3px 6px",textAlign:"right",fontFamily:"monospace",fontWeight:700,color:T.red}}>{fmt(Math.round(val))+" \u20ac"}</td>
+                    <td style={{padding:"3px 6px",textAlign:"right",fontFamily:"monospace",color:p>=0?T.red:T.text}}>{(p>=0?"+":"")+fmt(Math.round(p))+" \u20ac"}</td>
+                  </tr>;})}</tbody>
+              </table>
+            </div>
+          </div>
+        </div>)}
+
+        <div style={{marginTop:16,textAlign:"center",fontSize:8,color:T.dim}}>{"\u00a9 PARTNERS GROUP SK \u2022 "+tx("title")+" \u2022 BG 3/2026"}</div>
+      </div>
+    </div>
+  );
+}
