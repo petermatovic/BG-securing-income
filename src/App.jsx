@@ -25,9 +25,15 @@ var CARE_PLANS={
 var PEN_MIN_BR=516.8138335;var PEN_MAX_BR=1738.392396;
 var PEN_MIN_REP=238.7733085;var PEN_MAX_REP=1022.5837624;var PEN_COEF=0.462;
 
-function lr(t,a,d){var as=Object.keys(t).map(Number).sort(function(x,y){return x-y});var ds=[5,10,15,20,25,30,35,80];var ca=as[0];for(var i=0;i<as.length;i++){if(as[i]<=a)ca=as[i];}var cd=ds[0];for(var j=0;j<ds.length;j++){if(ds[j]<=d)cd=ds[j];}return(t[ca]&&t[ca][cd])||15;}
+function lr(t,a,d){var as=Object.keys(t).map(Number).sort(function(x,y){return x-y;});var ca=as[0];for(var i=0;i<as.length;i++){if(as[i]<=a)ca=as[i];}if(!t[ca])return 0;var avd=Object.keys(t[ca]).map(Number).sort(function(x,y){return x-y;});var cd=avd[0];for(var j=0;j<avd.length;j++){if(avd[j]<=d)cd=avd[j];}return t[ca][cd]||0;}
 function fmt(n,d){if(d===undefined)d=0;if(n===null||n===undefined||isNaN(n)||!isFinite(n))return"\u2014";return new Intl.NumberFormat("sk-SK",{minimumFractionDigits:d,maximumFractionDigits:d}).format(n);}
 function safe(x){return(x!==null&&x!==undefined&&isFinite(x))?x:0;}
+
+/* Clamped lookup for rate tables (DIS_R, CI_R, CA_R, IN_R) – clamps age to valid range */
+function rateAt(table,age){var keys=Object.keys(table).map(Number).sort(function(a,b){return a-b;});var clamped=Math.max(keys[0],Math.min(age,keys[keys.length-1]));return table[clamped]||0;}
+
+/* Interval lookup for KCH tables – keys are lower bounds of age ranges */
+function kchRate(table,age){var keys=Object.keys(table).map(Number).sort(function(a,b){return a-b;});var result=table[keys[0]];for(var i=0;i<keys.length;i++){if(keys[i]<=age)result=table[keys[i]];}return result||0;}
 
 /* PV of annuity: how much capital needed to pay 'pmt' monthly for 'n' months at rate 'r'/month */
 function pvAnnuity(r,n){r=Number(r)||0;n=Number(n)||0;if(n<=0)return 0;if(r===0)return n;return(1-Math.pow(1+r,-n))/r;}
@@ -46,15 +52,12 @@ function monthlySavings(target,annualRate,years){
 /* FV of annuity */
 function fvAnnuity(pmt,r,n){pmt=Number(pmt)||0;r=Number(r)||0;n=Number(n)||0;if(n<=0)return 0;if(r===0)return pmt*n;var x=pmt*((Math.pow(1+r,n)-1)/r);return isFinite(x)?x:0;}
 
-/* FV with daily compounding (matches monthlySavings formula from Excel) */
+/* FV of annuity – monthly compounding, consistent with monthlySavings() */
 function fvDaily(pmt,annualRate,years){
   pmt=Number(pmt)||0;annualRate=Number(annualRate)||0;years=Number(years)||0;
   if(pmt===0||years<=0)return 0;
   if(annualRate===0)return pmt*years*12;
-  var dr=annualRate/360;var nd=years*360;var mr=annualRate/12;
-  var factor=(1-Math.pow(1+dr,nd))/mr;
-  if(!isFinite(factor)||factor===0)return 0;
-  return -pmt*factor;
+  return fvAnnuity(pmt,annualRate/12,years*12);
 }
 
 /* UL cash value table per 300€/year (from Hárok1 projection) - scales proportionally for different UL amounts */
@@ -268,7 +271,7 @@ export default function App(){
   /* Actually the DD table values are per 100000. So: rate * sum/100000 * 12 */
   ulDeathPr=ul?(ulDS/100000)*lr(DD,age,ulDur)*12:0;
 
-  var dR=DIS_R[age]||3.79,ciRR=CI_R[age]||6.46,caRR=CA_R[age]||5.59,inRR=IN_R[age]||5.95;
+  var dR=rateAt(DIS_R,age),ciRR=rateAt(CI_R,age),caRR=rateAt(CA_R,age),inRR=rateAt(IN_R,age);
   var cDisPr=careActive?careVals[0]/1000*dR:0;
   var cPDPr=careActive?careVals[1]*rc.pi/1000:0;
   var cCIPr=careActive?careVals[2]/1000*ciRR:0;
@@ -277,10 +280,8 @@ export default function App(){
   var cTelPr=careVals[5]?15:0;
 
   var aDPr=aDS*rc.acc/1000;var pDPr=pDS*rc.pi/1000;
-  var kR=ciDur<=5?(KCH5[age]||2.35):(KCH10[age]||3.19);
+  var kR=ciDur<=5?kchRate(KCH5,age):kchRate(KCH10,age);
   var ciPr=ul?(ciS/1000*ciRR):(ciS/10000*kR);
-  /* If UL is on, CI uses CARE rate. If off, uses standalone KCH rate */
-  ciPr=ul?(ciS/1000*ciRR):(ciS/10000*kR);
 
   var hPr=hS*4.25;var sPr=sS*8.32/100;var fPr=fS*rc.frac/1000;
   var telPr=telOn?15:0;
