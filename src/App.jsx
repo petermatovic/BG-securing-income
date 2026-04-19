@@ -229,7 +229,14 @@ var I={
   cgTitle: {sk:"Metlife Credit Guard", en:"Metlife Credit Guard", bg:"Metlife Credit Guard"},
   careTitle: {sk:"Metlife CARE", en:"Metlife CARE", bg:"Metlife CARE"},
   yes: {sk:"\u00e1no", en:"yes", bg:"\u0434\u0430"},
-  min25: {sk:"(min 25)", en:"(min 25)", bg:"(min 25)"}
+  min25: {sk:"(min 25)", en:"(min 25)", bg:"(min 25)"},
+  rdTitle: {sk: "Detail v\u00fdpo\u010dtu renty", en: "Pension calculation detail", bg: "\u0414\u0435\u0442\u0430\u0439\u043b \u043d\u0430 \u0438\u0437\u0447\u0438\u0441\u043b\u0435\u043d\u0438\u0435\u0442\u043e"},
+  rdGap: {sk: "Po\u017eadovan\u00e1 mesa\u010dn\u00e1 renta (v\u00fdpadok)", en: "Required monthly pension (gap)", bg: "\u041d\u0435\u043e\u0431\u0445\u043e\u0434\u0438\u043c\u0430 \u043c\u0435\u0441\u0435\u0447\u043d\u0430 \u043f\u0435\u043d\u0441\u0438\u044f"},
+  rdDur: {sk: "Doba poberania renty", en: "Pension duration", bg: "\u041f\u0435\u0440\u0438\u043e\u0434 \u043d\u0430 \u043f\u043e\u043b\u0443\u0447\u0430\u0432\u0430\u043d\u0435"},
+  rdYield: {sk: "O\u010dak\u00e1van\u00e9 zhodnotenie po\u010das renty", en: "Expected appreciation during payout", bg: "\u041e\u0447\u0430\u043a\u0432\u0430\u043d\u0430 \u0434\u043e\u0445\u043e\u0434\u043d\u043e\u0441\u0442"},
+  rdMattress: {sk: "Potrebn\u00fd kapit\u00e1l, keby sa ne\u00faroko\u010dil", en: "Required capital without interest", bg: "\u041d\u0435\u043e\u0431\u0445\u043e\u0434\u0438\u043c \u043a\u0430\u043f\u0438\u0442\u0430\u043b \u0431\u0435\u0437 \u043b\u0438\u0445\u0432\u0430"},
+  rdSaved: {sk: "V\u00e1\u0161 bonus v\u010faka \u00faro\u010deniu", en: "Your bonus thanks to investing", bg: "\u0412\u0430\u0448\u0438\u044f\u0442 \u0431\u043e\u043d\u0443\u0441 \u0431\u043b\u0430\u0433\u043e\u0434\u0430\u0440\u0435\u043d\u0438\u0435 \u043d\u0430 \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0440\u0430\u043d\u0435"},
+  rdExpl: {sk: "Suma, ktor\u00fa skuto\u010dne potrebujete nakumulova\u0165, je podstatne ni\u017e\u0161ia, preto\u017ee va\u0161a renta sa bude zhodnocova\u0165 aj po\u010das jej vypl\u00e1cania.", en: "The amount you actually need to accumulate is significantly lower because your pension will continue to appreciate even during its payout.", bg: "\u0421\u0443\u043c\u0430\u0442\u0430, \u043a\u043e\u044f\u0442\u043e \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0442\u0435\u043b\u043d\u043e \u0442\u0440\u044f\u0431\u0432\u0430 \u0434\u0430 \u043d\u0430\u0442\u0440\u0443\u043f\u0430\u0442\u0435, \u0435 \u0437\u043d\u0430\u0447\u0438\u0442\u0435\u043b\u043d\u043e \u043f\u043e-\u043d\u0438\u0441\u043a\u0430, \u0442\u044a\u0439 \u043a\u0430\u0442\u043e \u043f\u0435\u043d\u0441\u0438\u044f\u0442\u0430 \u0432\u0438 \u0449\u0435 \u043f\u0440\u043e\u0434\u044a\u043b\u0436\u0438 \u0434\u0430 \u0441\u0435 \u043e\u043b\u0438\u0445\u0432\u044f\u0432\u0430."}
 };
 function t(k,l){return(I[k]&&I[k][l])||I[k].sk||k;}
 
@@ -388,6 +395,7 @@ export default function App(){
   var _tab=_("model"),tab=_tab[0],sTab=_tab[1];
 
   var _embO=_(""),embO=_embO[0],sEmbO=_embO[1];
+  var _showRD=_(false),showRD=_showRD[0],sShowRD=_showRD[1];
 
   var rc=RCT[rk]||RCT[1];
   var calc=useMemo(function(){return calcAll(br,ne,age,dur,iy/100,py/100,pyr,st,loan,ul,ulM,cg,cgDD,cgS,cp,cgD,embO);},[br,ne,age,dur,iy,py,pyr,st,loan,ul,ulM,cg,cgDD,cgS,cp,cgD,embO]);
@@ -571,7 +579,45 @@ export default function App(){
                 <p style={{fontSize:12,color:T.dim,fontFamily:FB,marginTop:10,lineHeight:1.4}}>
                   {tx("overviewLongText")}
                 </p>
-                <div style={{marginTop:16}}><button style={{background:T.red,color:"#fff",border:"none",padding:"10px 20px",borderRadius:6,fontFamily:FB,fontWeight:700,fontSize:12,cursor:"pointer",boxShadow:"0 4px 10px rgba(139,21,56,0.3)"}}>{tx("btnDetailRenty")}</button></div>
+                <div style={{marginTop:16}}>
+                  <button onClick={function(){sShowRD(!showRD);}} style={{background:showRD?T.bg:T.red,color:showRD?T.text:"#fff",border:showRD?"1px solid "+T.border:"none",padding:"10px 20px",borderRadius:6,fontFamily:FB,fontWeight:700,fontSize:12,cursor:"pointer",boxShadow:showRD?"none":"0 4px 10px rgba(139,21,56,0.3)",transition:"all 0.2s"}}>
+                    {tx("btnDetailRenty")} {showRD?"\u25b2":"\u25bc"}
+                  </button>
+                </div>
+                {showRD&&(
+                  <div style={{marginTop:16,padding:20,background:T.bg,borderRadius:8,border:"1px solid "+T.border,animation:"fadeIn 0.3s ease"}}>
+                    <div style={{fontSize:15,fontWeight:800,fontFamily:FH,color:T.text,marginBottom:16,letterSpacing:"-0.02em"}}>{tx("rdTitle")}</div>
+                    
+                    <div style={{display:"flex",justifyContent:"space-between",paddingBottom:8,borderBottom:"1px solid "+T.border}}>
+                      <span style={{fontSize:11,color:T.dim,fontFamily:FB,paddingRight:20}}>{tx("rdGap")}</span>
+                      <span style={{fontSize:13,fontWeight:700,fontFamily:MN,color:T.text,whiteSpace:"nowrap"}}>{fmt(Math.max(0,calc.pen.gap))} &euro; / {tx("month")}</span>
+                    </div>
+                    
+                    <div style={{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid "+T.border}}>
+                      <span style={{fontSize:11,color:T.dim,fontFamily:FB,paddingRight:20}}>{tx("rdDur")}</span>
+                      <span style={{fontSize:13,fontWeight:700,fontFamily:MN,color:T.text,whiteSpace:"nowrap"}}>{pyr} {tx("years")}</span>
+                    </div>
+                    
+                    <div style={{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid "+T.border}}>
+                      <span style={{fontSize:11,color:T.dim,fontFamily:FB,paddingRight:20}}>{tx("rdYield")}</span>
+                      <span style={{fontSize:13,fontWeight:700,fontFamily:MN,color:T.text,whiteSpace:"nowrap"}}>{py} %</span>
+                    </div>
+                    
+                    <div style={{marginTop:16,padding:16,background:"rgba(139,21,56,0.04)",borderRadius:6,border:"1px dashed rgba(139,21,56,0.2)"}}>
+                      <div style={{fontSize:11,color:T.dim,fontFamily:FB,lineHeight:1.5,marginBottom:12}}>
+                        {tx("rdExpl")}
+                      </div>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
+                        <span style={{fontSize:11,color:T.dim,fontFamily:FB}}>{tx("rdMattress")}</span>
+                        <span style={{fontSize:13,textDecoration:"line-through",opacity:0.6,fontFamily:MN}}>{fmt(Math.max(0,calc.pen.gap)*pyr*12)} &euro;</span>
+                      </div>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
+                        <span style={{fontSize:11,fontWeight:700,color:"#22863a",fontFamily:FB}}>{tx("rdSaved")}</span>
+                        <span style={{fontSize:15,fontWeight:800,color:"#22863a",fontFamily:MN}}>+{fmt(Math.max(0,(Math.max(0,calc.pen.gap)*pyr*12)-calc.needed))} &euro;</span>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 
