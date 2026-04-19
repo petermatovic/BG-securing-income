@@ -108,7 +108,7 @@ function calcAll(br,ne,age,dur,iy,py,pyr,st,loan,ulOn,ulMonthly,cgOn,cgDD,cgInsu
   var monthlyPI=monthlySavings(piTarget,iy,dur);
 
   /* CARE sums */
-  var cp=CARE_PLANS[carePlan]||CARE_PLANS["NONE"];
+  var cp=CARE_PLANS[carePlan]||CARE_PLANS["not included"];
   var careDis=cp[0],carePD=cp[1],careCI=cp[2];
 
   /* Suggested sums (use pvFd = duration-based PV, matching Excel M11) */
@@ -375,7 +375,7 @@ export default function App(){
   var _ul=_(true),ul=_ul[0],sUl=_ul[1];var _ulM=_(25),ulM=_ulM[0],sUlM=_ulM[1];
   var _ulDS=_(4000),ulDS=_ulDS[0],sUlDS=_ulDS[1];var _ulDur=_(30),ulDur=_ulDur[0],sUlDur=_ulDur[1];
 
-  var _cp=_("SILVER"),cp=_cp[0],sCp=_cp[1];
+  var _cp=_("Silver plan"),cp=_cp[0],sCp=_cp[1];
   var _cDiD=_(30),cDiD=_cDiD[0],sCDiD=_cDiD[1];
 
   var _aDS=_(0),aDS=_aDS[0],sADS=_aDS[1];var _aDDur=_(30),aDDur=_aDDur[0],sADDur=_aDDur[1];
@@ -392,8 +392,8 @@ export default function App(){
   var rc=RCT[rk]||RCT[1];
   var calc=useMemo(function(){return calcAll(br,ne,age,dur,iy/100,py/100,pyr,st,loan,ul,ulM,cg,cgDD,cgS,cp,cgD,embO);},[br,ne,age,dur,iy,py,pyr,st,loan,ul,ulM,cg,cgDD,cgS,cp,cgD,embO]);
   var mPI=calc.monthlyPI;
-  var careVals=CARE_PLANS[cp]||CARE_PLANS["NONE"];
-  var careActive=cp!=="NONE";
+  var careVals=CARE_PLANS[cp]||CARE_PLANS["not included"];
+  var careActive=cp!=="not included";
 
   /* Premiums */
   var cgRate=lr(cgDD?DD:DOT,age,cgD);var cgPr=cg?(cgS/100000)*cgRate*12:0;
