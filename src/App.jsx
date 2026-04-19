@@ -288,7 +288,7 @@ var DK={
   totBg:"#282a3a",totBdr:"#c84666"
 };
 
-var G5="1.4fr 110px 110px 52px 95px";
+var G5="var(--g5)";
 var FH="'Manrope',Arial,sans-serif";
 var FB="'Inter',Arial,sans-serif";
 var MN="'Inter','Courier New',monospace";
@@ -529,7 +529,7 @@ export default function App(){
     <div style={{fontFamily:FB,background:T.bg,color:T.text,minHeight:"100vh"}}>
       {/* ─ HEADER ─────────────────────────────────────────────── */}
       <div style={{background:T.card,padding:"0 24px",borderBottom:"1px solid "+T.border,marginBottom:30}}>
-        <div className="top-bar-content" style={{maxWidth:1440,margin:"0 auto",height:64,justifyContent:"space-between"}}>
+        <div className="top-bar-content" style={{maxWidth:1440,margin:"0 auto",justifyContent:"space-between"}}>
           
           <div style={{display:"flex",alignItems:"center",gap:40}}>
             {/* Logo/Avatar - PARTNERS wordmark podľa manuálu doplneny o symbol */}
@@ -550,7 +550,7 @@ export default function App(){
             {/* TABS removed from here */}
           </div>
 
-          <div className="no-print" style={{display:"flex",alignItems:"center",gap:6}}>
+          <div className="no-print header-controls" style={{display:"flex",alignItems:"center",gap:6}}>
             {["bg","sk","en"].map(function(lg){return <button key={lg} className="lang-btn" onClick={function(){setLang(lg);}} style={btnS(lang===lg)}>{lg.toUpperCase()}</button>;})}
             <div style={{width:1,height:18,background:T.border,margin:"0 4px"}}></div>
             <button className="lang-btn" onClick={function(){setDark(!dark);}} style={btnS(false)}>{dark?tx("light"):tx("dark")}</button>
@@ -593,7 +593,7 @@ export default function App(){
           
           {/* TABS CENTERED OVER MAIN COLUMN */}
           <div style={{display:"flex",justifyContent:"center"}}>
-            <div style={{display:"inline-flex",gap:4,background:T.card,padding:5,borderRadius:12,border:"1px solid "+T.border,boxShadow:"0 3px 12px rgba(0,0,0,0.03)"}}>
+            <div className="tab-buttons" style={{display:"inline-flex",gap:4,background:T.card,padding:5,borderRadius:12,border:"1px solid "+T.border,boxShadow:"0 3px 12px rgba(0,0,0,0.03)"}}>
               {[{id:"model",k:"tabModel"},{id:"overview",k:"tabOverview"},{id:"invest",k:"tabInvest"}].map(function(tb){
                 var a=tab===tb.id;
                 return <button key={tb.id} onClick={function(){sTab(tb.id);}} style={{
@@ -613,7 +613,7 @@ export default function App(){
         <div className="main-grid">
           
           {/* LFT COLUMN: VSTUPNÉ ÚDAJE (Fixný pre vš. taby) */}
-          <aside>
+          <aside className={tab !== "model" ? "hide-on-mobile" : ""}>
             <div style={{background:T.card,borderRadius:8,padding:"14px 18px",boxShadow:"0 2px 10px rgba(0,0,0,0.02)",border:"1px solid "+T.border,marginBottom:14}}>
               <div style={{...mL(T),color:T.red,marginBottom:10,fontSize:11}}>{tx("clientSection")}</div>
               <div style={{display:"flex",flexDirection:"column",gap:10}}>
@@ -793,28 +793,30 @@ export default function App(){
                 </Sec>
                 
                 <Sec T={T} t={tx("investPart")} type="must">
+                  <div className="table-responsive">
                 {function(){
                   var piRealFV=fvDaily(piReal,iy/100,dur);
                   var pvF=calc.pvF||1;
                   var piRealPension=pvF>0?(piRealFV+(calc.ulSavings||0))/pvF:0;
                   var w=mW(T),si={...mI(T),fontSize:12};
                   return(
-                    <div style={{padding:"4px 0"}}>
-                      <div style={{display:"grid",gridTemplateColumns:"1fr 80px 80px 80px",gap:6,padding:"4px 0",borderBottom:"2px solid "+T.red,marginBottom:6}}>
+                    <div style={{padding:"4px 0", minWidth:"450px"}}>
+                      <div style={{display:"grid",gridTemplateColumns:"var(--g4)",gap:6,padding:"4px 0",borderBottom:"2px solid "+T.red,marginBottom:6}}>
                         <div style={{fontSize:9,fontWeight:700,color:T.dim,textTransform:"uppercase"}}>PI</div>
                         <div style={{fontSize:9,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("realSum")}</div>
                         <div style={{fontSize:9,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("pension")}</div>
                         <div style={{fontSize:9,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("month")}</div>
                       </div>
-                      <div style={{display:"grid",gridTemplateColumns:"1fr 80px 80px 80px",gap:6,alignItems:"center",padding:"8px 0"}}>
+                      <div style={{display:"grid",gridTemplateColumns:"var(--g4)",gap:6,alignItems:"center",padding:"8px 0"}}>
                         <div style={{fontSize:12,fontWeight:600,color:T.text}}>{tx("addPI")}</div>
-                        <div style={w}><input type="number" value={piReal} onChange={function(e){sPiReal(Number(e.target.value));}} min={0} style={si}/><span style={{fontSize:9,color:T.dim}}>{tx("cur")}</span></div>
+                        <div style={w} className="inp-wrap"><input type="number" value={piReal} onChange={function(e){sPiReal(Number(e.target.value));}} min={0} style={si}/><span style={{fontSize:9,color:T.dim}}>{tx("cur")}</span></div>
                         <div style={{textAlign:"right",fontSize:13,fontWeight:700,color:"#22863a",fontFamily:MN}}>{fmt(Math.round(piRealPension))+" "+tx("cur")}</div>
                         <div style={{textAlign:"right",fontSize:13,fontWeight:600,color:T.text,fontFamily:MN}}>{fmt(piReal,2)+" "+tx("cur")}</div>
                       </div>
                     </div>
                   );
                 }()}
+                </div>
               </Sec>
               </div>
 
@@ -841,6 +843,8 @@ export default function App(){
                 </div>
 
                 <Sec T={T} t={tx("yearlyOverview")} type="must">
+                  <div className="table-responsive">
+                    <div style={{minWidth:"450px"}}>
                   <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
                     <thead><tr style={{borderBottom:"2px solid "+T.red}}>
                       {[tx("year"),tx("depTotal"),tx("futureVal"),tx("profit")].map(function(h,i){return <th key={i} style={{padding:"8px 4px",textAlign:"right",fontSize:9,fontWeight:700,color:T.dim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{h}</th>;})}
@@ -855,6 +859,8 @@ export default function App(){
                       </tr>;
                     })}</tbody>
                   </table>
+                    </div>
+                  </div>
                 </Sec>
               </div>
           </div></>)}
@@ -873,7 +879,7 @@ export default function App(){
                         {cg&&<Sel T={T} v={cgDD?"dd":"d"} c={function(v){sCgDD(v==="dd");}} o={[{v:"d",l:tx("deathOnly")},{v:"dd",l:tx("deathDis")}]}/>}
                      </div>
                   </div>
-                  {cg&&<div><CH T={T} L={L}/><DR T={T} l={cgDD?tx("deathAndDis"):tx("death")} sg={calc.sugCGDeath} si={cgS} sc={sCgS} dur={cgD} dc={sCgD} pr={cgPr} b={true}/></div>}
+                  {cg&&<div className="table-responsive"><div style={{minWidth:"450px"}}><CH T={T} L={L}/><DR T={T} l={cgDD?tx("deathAndDis"):tx("death")} sg={calc.sugCGDeath} si={cgS} sc={sCgS} dur={cgD} dc={sCgD} pr={cgPr} b={true}/></div></div>}
                 </div>
 
                 {/* Metlife UL */}
@@ -883,12 +889,12 @@ export default function App(){
                      <Chk T={T} l={tx("withUL")} ch={ul} c={sUl}/>
                   </div>
                   {ul&&(<div>
-                    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:12,padding:"10px",background:T.input,borderRadius:6,border:"1px solid "+T.border}}>
+                    <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:8,marginBottom:12,padding:"10px",background:T.input,borderRadius:6,border:"1px solid "+T.border}}>
                       <Inp T={T} l={tx("investUL")+" "+tx("min25")} v={ulM} c={sUlM} s={tx("cur")+"/m"} mn={25}/>
                       <div><div style={mL(T)}>{tx("savML")}</div><div style={{fontSize:13,fontWeight:700,color:T.text,fontFamily:MN,marginTop:4}}>{fmt(Math.round(calc.ulSavings))+" "+tx("cur")}</div></div>
                       <Inp T={T} l={tx("embDeath")} v={embO!==""?embO:Math.round(calc.embDeath)} c={sEmbO} s={tx("cur")}/>
                     </div>
-                    <CH T={T} L={L}/><DR T={T} l={tx("death")} sg={calc.sugULDeath} si={ulDS} sc={sUlDS} dur={ulDur} dc={sUlDur} pr={ulDeathPr} b={true}/>
+                    <div className="table-responsive"><div style={{minWidth:"450px"}}><CH T={T} L={L}/><DR T={T} l={tx("death")} sg={calc.sugULDeath} si={ulDS} sc={sUlDS} dur={ulDur} dc={sUlDur} pr={ulDeathPr} b={true}/></div></div>
                   </div>)}
                 </div>
 
@@ -898,25 +904,29 @@ export default function App(){
                      <span style={{fontSize:13,fontWeight:700,color:T.text,fontFamily:FH}}>{tx("careTitle")}</span>
                      <Sel T={T} v={cp} c={sCp} o={Object.keys(CARE_PLANS).map(function(k){return{v:k,l:k};})}/>
                   </div>
-                  {careActive&&(<div><CH T={T} L={L}/>
+                  {careActive&&(<div className="table-responsive"><div style={{minWidth:"450px"}}><CH T={T} L={L}/>
                     <DR T={T} l={tx("disTEMC")} si={careVals[0]} dur={cDiD} dc={sCDiD} pr={cDisPr}/>
                     <DR T={T} l={tx("permDis")} si={careVals[1]} dur={cDiD} pr={cPDPr}/>
                     <DR T={T} l={tx("ci40")} si={careVals[2]} pr={cCIPr}/>
                     <DR T={T} l={tx("cancer")} si={careVals[3]} pr={cCaPr}/>
                     <DR T={T} l={tx("insitu")} si={careVals[4]} pr={cInPr}/>
-                  </div>)}
+                  </div></div>)}
                 </div>
               </Sec>
               
               <Sec T={T} t={tx("tabCoverHeaderDoplnkSluzby")} type="must">
+                <div className="table-responsive">
+                <div style={{minWidth:"450px"}}>
                 <CH T={T} L={L}/>
                 <DR T={T} l={tx("accDeath")} si={aDS} sc={sADS} dur={aDDur} dc={sADDur} pr={aDPr} b={true}/>
                 <DR T={T} l={tx("permCons")} sg={calc.sugPermDis} si={pDS} sc={sPDS} dur={pDDur} dc={sPDDur} pr={pDPr} b={true}/>
                 <DR T={T} l={tx("critIll")} sg={calc.sugCI} si={ciS} sc={sCiS} dur={ciDur} dc={sCiDur} pr={ciPr} b={true}/>
-                <div style={{marginTop:16,paddingTop:12,borderTop:"1px dashed "+T.border}}>
+                <div style={{margin:"16px 0",paddingTop:12,borderTop:"1px dashed "+T.border}}>
                   <NR T={T} l={tx("hospital")} note={"5-300 "+tx("cur")} si={hS} sc={sHS} pr={hPr} mx={300}/>
                   <NR T={T} l={tx("surgical")} note={"150-5000 "+tx("cur")} si={sS} sc={sSS} pr={sPr} mx={5000}/>
                   <NR T={T} l={tx("fractures")} note={"500-1500 "+tx("cur")} si={fS} sc={sFS} pr={fPr} mx={1500}/>
+                </div>
+                </div>
                 </div>
                 <div style={{padding:"12px 0",display:"flex",gap:16,flexWrap:"wrap"}}>
                   <Chk T={T} l={tx("telemed")+" (+15 "+tx("cur")+")"} ch={telOn} c={sTelOn}/>
