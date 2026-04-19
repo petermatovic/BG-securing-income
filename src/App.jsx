@@ -75,7 +75,7 @@ function penRepl(brutto){
   return brutto*PEN_COEF;
 }
 
-function calcAll(br,ne,age,dur,iy,py,pyr,st,loan,ulOn,ulMonthly,cgOn,cgDD,cgInsured,carePlan,cgDur){
+function calcAll(br,ne,age,dur,iy,py,pyr,st,loan,ulOn,ulMonthly,cgOn,cgDD,cgInsured,carePlan,cgDur, embDO){
   br=Number(br)||0;ne=Number(ne)||0;dur=Math.max(Number(dur)||1,1);
   iy=Number(iy)||0;py=Number(py)||0;pyr=Number(pyr)||0;
   var pr=penRepl(br);
@@ -84,7 +84,7 @@ function calcAll(br,ne,age,dur,iy,py,pyr,st,loan,ulOn,ulMonthly,cgOn,cgDD,cgInsu
   var gap50=ne-repl50,gap70=ne-repl70,gap90=ne-repl90,gapPen=ne-replPen;
   var pct50=ne>0?repl50/ne:0,pct70=ne>0?repl70/ne:0,pct90=ne>0?repl90/ne:0,pctPen=ne>0?replPen/ne:0;
   var pvF=pvAnnuity(py/12,pyr*12);
-  var pvFd=pvAnnuity(py/12,dur*12);/* PV factor for duration (used in suggested sums) */
+  var pvFd=pvAnnuity(py/12,dur*12);
   var needed=safe(pvF*gapPen);
 
   /* UL savings from projection table */
@@ -101,13 +101,14 @@ function calcAll(br,ne,age,dur,iy,py,pyr,st,loan,ulOn,ulMonthly,cgOn,cgDD,cgInsu
     else if(age<=55)embDeath=ulYearly*10;
     else embDeath=ulYearly*6;
   }
+  if(embDO!==""&&embDO!=null) embDeath=Number(embDO);
 
   /* Monthly PI savings */
   var piTarget=safe(needed-ulSavings);
   var monthlyPI=monthlySavings(piTarget,iy,dur);
 
   /* CARE sums */
-  var cp=CARE_PLANS[carePlan]||CARE_PLANS["not included"];
+  var cp=CARE_PLANS[carePlan]||CARE_PLANS["NONE"];
   var careDis=cp[0],carePD=cp[1],careCI=cp[2];
 
   /* Suggested sums (use pvFd = duration-based PV, matching Excel M11) */
@@ -144,7 +145,7 @@ function calcAll(br,ne,age,dur,iy,py,pyr,st,loan,ulOn,ulMonthly,cgOn,cgDD,cgInsu
 
 /* i18n */
 var I={
-  title:{sk:"Kalkula\u010dka zabezpe\u010denia pr\u00edjmu",en:"Income Protection Calculator",bg:"\u041a\u0430\u043b\u043a\u0443\u043b\u0430\u0442\u043e\u0440 \u0437\u0430\u0437\u0438\u0442\u0430 \u043d\u0430 \u0434\u043e\u0445\u043e\u0434\u0430"},
+  title:{sk:"Kalkula\u010dka zabezpe\u010denia pr\u00edjmu",en:"Income Protection Calculator",bg:"\u041a\u0430\u043b\u043a\u0443\u043b\u0430\u0442\u043e\u0440 \u0437\u0430 \u0437\u0430\u0449\u0438\u0442\u0430 \u043d\u0430 \u0434\u043e\u0445\u043e\u0434\u0430"},
   inputs:{sk:"Vstupn\u00e9 \u00fadaje",en:"Input Data",bg:"\u0412\u0445\u043e\u0434\u043d\u0438 \u0434\u0430\u043d\u043d\u0438"},
   brutto:{sk:"Pr\u00edjem brutto",en:"Gross income",bg:"\u0411\u0440\u0443\u0442\u043e \u0434\u043e\u0445\u043e\u0434"},netto:{sk:"Pr\u00edjem netto",en:"Net income",bg:"\u041d\u0435\u0442\u043e \u0434\u043e\u0445\u043e\u0434"},
   age:{sk:"Vek",en:"Age",bg:"\u0412\u044a\u0437\u0440\u0430\u0441\u0442"},
@@ -175,8 +176,8 @@ var I={
   disTEMC:{sk:"Invalidita chorobou alebo \u00farazom min 51%",en:"Disability due to illness or accident min 51%",bg:"\u0418\u043d\u0432\u0430\u043b\u0438\u0434\u043d\u043e\u0441\u0442 \u043e\u0442 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0435 \u0438\u043b\u0438 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430 min 51%"},
   permDis:{sk:"Trval\u00e1 invalidita \u00farazom",en:"Permanent disability from accident",bg:"\u0422\u0440\u0430\u0439\u043d\u0430 \u0438\u043d\u0432\u0430\u043b\u0438\u0434\u043d\u043e\u0441\u0442 \u043e\u0442 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430"},
   ci40:{sk:"40 kritick\u00fdch chor\u00f4b",en:"40 critical illnesses",bg:"40 \u043a\u0440\u0438\u0442\u0438\u0447\u043d\u0438 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0438\u044f"},
-  cancer:{sk:"Rakovina",en:"Cancer",bg:"\u0420\u0430\u043a"},insitu:{sk:"Carcin\u00f3m in situ",en:"Carcinoma in situ",bg:"\u041a\u0430\u0440\u0446\u0438\u043d\u043e\u043c in situ"},
-  teleCare:{sk:"Telemedicna",en:"Telemedicine",bg:"\u0422\u0435\u043b\u0435\u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0430"},
+  cancer:{sk:"Rakovina",en:"Cancer",bg:"\u0420\u0430\u043a"},insitu:{sk:"Karcin\u00f3m in situ",en:"Carcinoma in situ",bg:"\u041a\u0430\u0440\u0446\u0438\u043d\u043e\u043c in situ"},
+  teleCare:{sk:"Telemedic\u00edna",en:"Telemedicine",bg:"\u0422\u0435\u043b\u0435\u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0430"},
   accDeath:{sk:"\u00darazov\u00e1 smr\u0165",en:"Accidental death",bg:"\u0421\u043c\u044a\u0440\u0442 \u043e\u0442 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430"},
   permCons:{sk:"Trval\u00e9 n\u00e1sledky \u00farazu",en:"Permanent consequences of accident",bg:"\u0422\u0440\u0430\u0439\u043d\u0438 \u043f\u043e\u0441\u043b\u0435\u0434\u0438\u0446\u0438 \u043e\u0442 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430"},
   critIll:{sk:"Kritick\u00e9 choroby",en:"Critical illness",bg:"\u041a\u0440\u0438\u0442\u0438\u0447\u043d\u0438 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0438\u044f"},
@@ -184,6 +185,7 @@ var I={
   fractures:{sk:"Zlomeniny a pop\u00e1leniny",en:"Fractures and burns",bg:"\u0421\u0447\u0443\u043f\u0432\u0430\u043d\u0438\u044f \u0438 \u0438\u0437\u0433\u0430\u0440\u044f\u043d\u0438\u044f"},
   telemed:{sk:"Telemedic\u00edna",en:"Telemedicine",bg:"\u0422\u0435\u043b\u0435\u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0430"},
   waiver:{sk:"Waiver",en:"Waiver",bg:"Waiver"},
+  cur:{sk:"\u20ac",en:"\u20ac",bg:"\u20ac"},
   totalYearly:{sk:"Celkov\u00e9 ro\u010dn\u00e9 poistn\u00e9",en:"Total yearly premium",bg:"\u041e\u0431\u0449\u0430 \u0433\u043e\u0434\u0438\u0448\u043d\u0430 \u043f\u0440\u0435\u043c\u0438\u044f"},
   riskPart:{sk:"Rizikov\u00e1 \u010das\u0165",en:"Risk part",bg:"\u0420\u0438\u0441\u043a\u043e\u0432\u0430 \u0447\u0430\u0441\u0442"},
   investInc:{sk:"Investi\u010dn\u00e1 \u010das\u0165 z pr\u00edjmu",en:"Investment part of income",bg:"\u0418\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u043e\u043d\u043d\u0430 \u0447\u0430\u0441\u0442 \u043e\u0442 \u0434\u043e\u0445\u043e\u0434\u0430"},riskInc:{sk:"Rizikov\u00e1 \u010das\u0165 z pr\u00edjmu",en:"Risk part of income",bg:"\u0420\u0438\u0441\u043a\u043e\u0432\u0430 \u0447\u0430\u0441\u0442 \u043e\u0442 \u0434\u043e\u0445\u043e\u0434\u0430"},
@@ -203,32 +205,162 @@ var I={
   goal:{sk:"Cie\u013e",en:"Goal",bg:"\u0426\u0435\u043b"},
   colSugg:{sk:"Navrhovan\u00e1 suma",en:"Suggested sum",bg:"\u041f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0430 \u0441\u0443\u043c\u0430"},colSum:{sk:"Poistn\u00e1 suma",en:"Sum insured",bg:"\u0417\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u0430\u043d\u0430 \u0441\u0443\u043c\u0430"},colYrs:{sk:"Roky",en:"Years",bg:"\u0413\u043e\u0434\u0438\u043d\u0438"},colPrem:{sk:"Poistn\u00e9 za rok",en:"Premium per year",bg:"\u041f\u0440\u0435\u043c\u0438\u044f \u0437\u0430 \u0433\u043e\u0434\u0438\u043d\u0430"},
   light:{sk:"Svetl\u00e1",en:"Light",bg:"\u0421\u0432\u0435\u0442\u043b\u0430"},dark:{sk:"Tmav\u00e1",en:"Dark",bg:"\u0422\u044a\u043c\u043d\u0430"},
+  tabIncomeSecHeader: {sk:"Anal\u00fdza zabezpe\u010denia pr\u00edjmu", en:"Income protection analysis", bg:"\u0410\u043d\u0430\u043b\u0438\u0437 \u043d\u0430 \u0437\u0430\u0449\u0438\u0442\u0430\u0442\u0430 \u043d\u0430 \u0434\u043e\u0445\u043e\u0434\u0430"},
+  tabInvestCapHeader: {sk:"Invest\u00edcia a budovanie kapit\u00e1lu", en:"Investment and capital building", bg:"\u0418\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u0438 \u0438 \u043d\u0430\u0442\u0440\u0443\u043f\u0432\u0430\u043d\u0435 \u043d\u0430 \u043a\u0430\u043f\u0438\u0442\u0430\u043b"},
+  tabCoverModelHeader: {sk:"Model poistn\u00e9ho krytia", en:"Insurance coverage model", bg:"\u041c\u043e\u0434\u0435\u043b \u043d\u0430 \u0437\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u0430\u043d\u0435"},
+  descModel: {sk:"Kalkula\u010dka sl\u00fa\u017ei na model\u00e1ciu finan\u010dn\u00e9ho zabezpe\u010denia a invest\u00edci\u00ed klienta za \u00fa\u010delom pokrytia \u017eivotn\u00fdch riz\u00edk a renty.", en:"The calculator models financial security and investments to cover life risks and pension.", bg:"\u041a\u0430\u043b\u043a\u0443\u043b\u0430\u0442\u043e\u0440\u044a\u0442 \u0441\u043b\u0443\u0436\u0438 \u0437\u0430 \u043c\u043e\u0434\u0435\u043b\u0438\u0440\u0430\u043d\u0435 \u043d\u0430 \u0444\u0438\u043d\u0430\u043d\u0441\u043e\u0432\u0430\u0442\u0430 \u0437\u0430\u0449\u0438\u0442\u0430 \u0438 \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u0438"},
+  overviewLossComp: {sk:"Porovnanie straty pr\u00edjmu", en:"Income loss comparison", bg:"\u0421\u0440\u0430\u0432\u043d\u0435\u043d\u0438\u0435 \u043d\u0430 \u0437\u0430\u0433\u0443\u0431\u0430\u0442\u0430 \u043d\u0430 \u0434\u043e\u0445\u043e\u0434\u0430"},
+  overviewLossLbl: {sk:"V\u00fdpadok", en:"Loss", bg:"\u0417\u0430\u0433\u0443\u0431\u0430"},
+  incomeStrata: {sk:"strata pr\u00edjmu", en:"income loss", bg:"\u0437\u0430\u0433\u0443\u0431\u0430 \u043d\u0430 \u0434\u043e\u0445\u043e\u0434"},
+  withIncome: {sk:"s pr\u00edjmom", en:"with income", bg:"\u0441 \u0434\u043e\u0445\u043e\u0434"},
+  overviewLongText: {sk:"Tieto prostriedky v\u00e1m umo\u017enia udr\u017ea\u0165 si aktu\u00e1lnu \u017eivotn\u00fa \u00farove\u0148 aj pri v\u00fdpadku pr\u00edjmu trval\u00e9ho charakteru (napr. zdravotn\u00e9 postihnutie alebo odchod na d\u00f4chodok).", en:"These funds will allow you to maintain your standard of living in case of a permanent income loss.", bg:"\u0422\u0435\u0437\u0438 \u0441\u0440\u0435\u0434\u0441\u0442\u0432\u0430 \u0449\u0435 \u0432\u0438 \u043f\u043e\u0437\u0432\u043e\u043b\u044f\u0442 \u0434\u0430 \u0437\u0430\u043f\u0430\u0437\u0438\u0442\u0435 \u0441\u0442\u0430\u043d\u0434\u0430\u0440\u0442\u0430 \u0441\u0438 \u043d\u0430 \u0436\u0438\u0432\u043e\u0442 \u0434\u043e\u0440\u0438 \u043f\u0440\u0438 \u0442\u0440\u0430\u0439\u043d\u0430 \u0437\u0430\u0433\u0443\u0431\u0430 \u043d\u0430 \u0434\u043e\u0445\u043e\u0434"},
+  btnDetailRenty: {sk:"ZOBRAZI\u0164 DETAIL RENTY", en:"SHOW PENSION DETAIL", bg:"\u041f\u041e\u041a\u0410\u0416\u0418 \u0414\u0415\u0422\u0410\u0419\u041b\u0418 \u0417\u0410 \u041f\u0415\u041d\u0421\u0418\u042f\u0422\u0410"},
+  monthlyPiAndModel: {sk:"Mesa\u010dne (PI + Model)", en:"Monthly (PI + Model)", bg:"\u041c\u0435\u0441\u0435\u0447\u043d\u043e (PI + \u041c\u043e\u0434\u0435\u043b)"},
+  lblRemAtLoss: {sk:"(Pri v\u00fdpadku pr\u00edjmu)", en:"(At income loss)", bg:"(\u041f\u0440\u0438 \u0437\u0430\u0433\u0443\u0431\u0430 \u043d\u0430 \u0434\u043e\u0445\u043e\u0434)"},
+  pillRisk: {sk:"Riziko", en:"Risk", bg:"\u0420\u0438\u0441\u043a"},
+  pillInvest: {sk:"Invest", en:"Invest", bg:"\u0418\u043d\u0432\u0435\u0441\u0442."},
+  pillExpenses: {sk:"V\u00fddaj", en:"Expense", bg:"\u0420\u0430\u0437\u0445\u043e\u0434"},
+  investAnalTitle: {sk:"Anal\u00fdza invest\u00edcie", en:"Investment analysis", bg:"\u0418\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u043e\u043d\u0435\u043d \u0430\u043d\u0430\u043b\u0438\u0437"},
+  investCiel: {sk:"Metlife cie\u013e", en:"Metlife goal", bg:"\u0426\u0435\u043b Metlife"},
+  fvInvestment: {sk:"Bud\u00faca hodnota invest\u00edcie", en:"Future investment value", bg:"\u0411\u044a\u0434\u0435\u0449\u0430 \u0441\u0442\u043e\u0439\u043d\u043e\u0441\u0442 \u043d\u0430 \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u044f\u0442\u0430"},
+  tabCoverHeaderRizik: {sk:"Krytie riz\u00edk a \u00faveru", en:"Coverage of risks and loan", bg:"\u041f\u043e\u043a\u0440\u0438\u0442\u0438\u0435 \u043d\u0430 \u0440\u0438\u0441\u043a\u043e\u0432\u0435 \u0438 \u043a\u0440\u0435\u0434\u0438\u0442\u0438"},
+  tabCoverHeaderMetlifeHlavne: {sk:"Metlife Hlavn\u00e9 krytie", en:"Metlife Main Coverage", bg:"\u041e\u0441\u043d\u043e\u0432\u043d\u043e \u043f\u043e\u043a\u0440\u0438\u0442\u0438\u0435 Metlife"},
+  tabCoverHeaderDoplnkSluzby: {sk:"Doplnkov\u00e9 a flexibiln\u00e9 pripoistenia", en:"Additional and flexible riders", bg:"\u0414\u043e\u043f\u044a\u043b\u043d\u0438\u0442\u0435\u043b\u043d\u0438 \u0438 \u0433\u044a\u0432\u043a\u0430\u0432\u0438 \u043f\u043e\u043a\u0440\u0438\u0442\u0438\u044f"},
+  cgTitle: {sk:"Metlife Credit Guard", en:"Metlife Credit Guard", bg:"Metlife Credit Guard"},
+  careTitle: {sk:"Metlife CARE", en:"Metlife CARE", bg:"Metlife CARE"},
+  yes: {sk:"\u00e1no", en:"yes", bg:"\u0434\u0430"},
+  min25: {sk:"(min 25)", en:"(min 25)", bg:"(min 25)"}
 };
 function t(k,l){return(I[k]&&I[k][l])||I[k].sk||k;}
 
-/* Brand */
-var LT={bg:"#ECEDED",card:"#FFFFFF",text:"#4D4D4D",dim:"#989FA7",border:"#d6d8da",bl:"#f0f0f0",input:"#f7f7f8",red:"#AB0534",blue:"#003049",yellow:"#FFF3B0",lblue:"#C1DAE7",lgreen:"#CBD9C4",hbg:"#FFFFFF",secMust:"#AB0534",secNice:"#4D4D4D",secSub:"#f5f5f6",totBg:"#FFFFFF",totBdr:"#AB0534"};
-var DK={bg:"#111111",card:"#1A1A1A",text:"#ededed",dim:"#989FA7",border:"#4D4D4D",bl:"#2A2A2A",input:"#111111",red:"#AB0534",blue:"#ededed",yellow:"#2a2500",lblue:"#2A2A2A",lgreen:"#222a22",hbg:"#1A1A1A",secMust:"#AB0534",secNice:"#2A2A2A",secSub:"#2A2A2A",totBg:"#1A1A1A",totBdr:"#AB0534"};
+/* ══════════════════════════════════════════════════════════════
+   STERLING HERITAGE – Light Mode Tokens (matches Stitch output)
+   White cards, burgundy accents, lavender section fills
+   ══════════════════════════════════════════════════════════════ */
+/* Light theme */
+var LT={
+  bg:"#eef0f5",          /* page background – cool light grey */
+  card:"#ffffff",         /* card surface */
+  text:"#1a1a2e",        /* primary text */
+  dim:"#6b6b80",         /* muted text */
+  border:"#e0dde8",      /* card borders */
+  bl:"#f5f4f8",          /* row separator fill */
+  input:"#f8f7fa",       /* input bg */
+  red:"#8B1538",         /* Sterling burgundy */
+  blue:"#3d3d8f",        /* secondary accent (blue labels) */
+  yellow:"#fff4eb",      /* warm highlight bg */
+  lblue:"#eceaf8",       /* lavender tint for cards */
+  lgreen:"#e8f4ee",      /* green tint for positive */
+  hbg:"#ffffff",         /* header bg */
+  secMust:"#8B1538",     /* Must-have header gradient start */
+  secNice:"#44445a",     /* Nice header */
+  secSub:"#f3f1f7",      /* Sub-section header */
+  totBg:"#ffffff",       /* totals card bg */
+  totBdr:"#8B1538"       /* totals card border */
+};
+/* Dark theme */
+var DK={
+  bg:"#1d1e2a",card:"#282a3a",text:"#f2f1f6",dim:"#a1a2b8",
+  border:"#3d3e54",bl:"#343548",input:"#1c1e2d",red:"#c84666",
+  blue:"#9a9ad6",yellow:"#382914",lblue:"#282a3a",lgreen:"#202c26",
+  hbg:"#282a3a",secMust:"#8B1538",secNice:"#3d3e54",secSub:"#343548",
+  totBg:"#282a3a",totBdr:"#c84666"
+};
 
-var G5="1.3fr 105px 105px 50px 90px";var MN="Arial,monospace";
-function mL(T){return{fontSize:9,fontWeight:600,color:T.dim,textTransform:"uppercase",letterSpacing:"0.04em",fontFamily:"Arial,sans-serif"};}
-function mI(T){return{flex:1,background:"transparent",border:"none",outline:"none",fontSize:13,fontWeight:600,color:T.text,fontFamily:"Arial,sans-serif",width:"100%",textAlign:"right"};}
-function mW(T){return{display:"flex",alignItems:"center",gap:4,background:T.input,borderRadius:4,padding:"5px 7px",border:"1px solid "+T.border};}
+var G5="1.4fr 110px 110px 52px 95px";
+var FH="'Manrope',Arial,sans-serif";
+var FB="'Inter',Arial,sans-serif";
+var MN="'Inter','Courier New',monospace";
 
-/* Components (OUTSIDE App) */
-function Inp(p){var T=p.T;return(<div style={{display:"flex",flexDirection:"column",gap:2}}>{p.l&&<label style={mL(T)}>{p.l}</label>}<div style={mW(T)} className="inp-wrap"><input type="number" value={p.v} onChange={function(e){p.c(Number(e.target.value));}} min={p.mn||0} max={p.mx||9999999} step={p.st||1} style={mI(T)}/>{p.s&&<span style={{fontSize:10,color:T.dim,fontWeight:600}}>{p.s}</span>}</div></div>);}
-function Sel(p){var T=p.T;return(<div style={{display:"flex",flexDirection:"column",gap:2}}>{p.l&&<label style={mL(T)}>{p.l}</label>}<select value={p.v} onChange={function(e){p.c(e.target.value);}} style={{background:T.input,borderRadius:4,padding:"6px 7px",border:"1px solid "+T.border,fontSize:12,fontWeight:600,color:T.text,fontFamily:"Arial,sans-serif",cursor:"pointer",outline:"none"}}>{p.o.map(function(x){return <option key={x.v} value={x.v}>{x.l}</option>;})}</select></div>);}
-function Chk(p){var T=p.T;return(<label className="chk-label" style={{display:"flex",alignItems:"center",gap:6,cursor:"pointer",fontSize:11,fontWeight:600,color:p.ch?T.text:T.dim,fontFamily:"Arial,sans-serif"}}><div onClick={function(){p.c(!p.ch);}} style={{width:16,height:16,borderRadius:3,border:p.ch?"2px solid "+T.red:"2px solid "+T.border,background:p.ch?T.red:"transparent",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}>{p.ch&&<span style={{color:"#fff",fontSize:10,fontWeight:900}}>{"\u2713"}</span>}</div>{p.l}</label>);}
-function Sec(p){var T=p.T;var bgM={must:T.secMust,nice:T.secNice,sub:T.secSub};var txM={must:"#fff",nice:"#fff",sub:T.text};return(<div className="sec-card" style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden",marginBottom:8}}><div style={{padding:"7px 14px",background:bgM[p.type]||T.secSub,display:"flex",alignItems:"center",justifyContent:"space-between"}}><span style={{fontSize:11,fontWeight:700,color:txM[p.type]||T.text,fontFamily:"Arial,sans-serif"}}>{p.t}</span>{p.badge!==undefined&&<span style={{fontSize:9,fontWeight:600,background:"rgba(255,255,255,0.2)",padding:"1px 7px",borderRadius:10,color:txM[p.type]||T.text}}>{p.badge}</span>}</div><div style={{padding:"8px 14px"}}>{p.children}</div></div>);}
-function CH(p){var T=p.T;return(<div style={{display:"grid",gridTemplateColumns:G5,gap:3,padding:"3px 0",borderBottom:"2px solid "+T.red,marginBottom:1}}>{["",t("colSugg",p.L),t("colSum",p.L),t("colYrs",p.L),t("colPrem",p.L)].map(function(h,i){return <div key={i} style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:i>0?"right":"left",fontFamily:"Arial,sans-serif"}}>{h}</div>;})}</div>);}
-function DR(p){var T=p.T;var w=mW(T),s={...mI(T),fontSize:11};return(<div className="grid-row" style={{display:"grid",gridTemplateColumns:G5,gap:3,alignItems:"center",padding:"4px 0",borderBottom:"1px solid "+T.bl}}><div style={{fontWeight:p.b?700:500,color:p.b?T.text:T.dim,fontSize:p.b?11:10,fontFamily:"Arial,sans-serif"}}>{p.l}</div><div style={{textAlign:"right",fontSize:10,color:T.dim,fontFamily:MN}}>{p.sg!=null?fmt(p.sg)+" \u20ac":""}</div>{p.sc?(<div style={w}><input type="number" value={p.si||0} onChange={function(e){p.sc(Number(e.target.value));}} style={s}/><span style={{fontSize:8,color:T.dim}}>{"\u20ac"}</span></div>):(<div style={{textAlign:"right",fontSize:10,color:T.dim,fontFamily:MN}}>{p.si!=null?fmt(p.si)+" \u20ac":""}</div>)}{p.dc?(<div style={w}><input type="number" value={p.dur||0} onChange={function(e){p.dc(Number(e.target.value));}} min={1} max={80} style={s}/></div>):(<div style={{textAlign:"right",fontSize:10,color:T.dim,fontFamily:MN}}>{p.dur||""}</div>)}<div style={{textAlign:"right",fontSize:11,fontWeight:p.b?700:600,color:p.pr>0.005?T.red:T.dim,fontFamily:MN}}>{p.pr!=null?fmt(p.pr,2)+" \u20ac":""}</div></div>);}
-function NR(p){var T=p.T;var w=mW(T),s={...mI(T),fontSize:11};return(<div className="grid-row" style={{display:"grid",gridTemplateColumns:G5,gap:3,alignItems:"center",padding:"4px 0",borderBottom:"1px solid "+T.bl}}><div style={{fontSize:10,color:T.dim}}>{p.l}{p.note?" ("+p.note+")":""}</div><div></div><div style={w}><input type="number" value={p.si} onChange={function(e){p.sc(Number(e.target.value));}} min={0} max={p.mx||9999} style={s}/><span style={{fontSize:8,color:T.dim}}>{"\u20ac"}</span></div><div></div><div style={{textAlign:"right",fontSize:11,fontWeight:600,color:p.pr>0.005?T.red:T.dim,fontFamily:MN}}>{fmt(p.pr,2)+" \u20ac"}</div></div>);}
+function mL(T){return{fontSize:9,fontWeight:700,color:T.dim,textTransform:"uppercase",letterSpacing:"0.07em",fontFamily:FB};}
+function mI(T){return{flex:1,background:"transparent",border:"none",outline:"none",fontSize:13,fontWeight:600,color:T.text,fontFamily:MN,width:"100%",textAlign:"right"};}
+function mW(T){return{display:"flex",alignItems:"center",gap:4,background:T.input,borderRadius:5,padding:"5px 8px",border:"1px solid "+T.border};}
+
+/* ─ Input component ──────────────────────────────────────────── */
+function Inp(p){var T=p.T;return(
+  <div style={{display:"flex",flexDirection:"column",gap:3}}>
+    {p.l&&<label style={mL(T)}>{p.l}</label>}
+    <div style={mW(T)} className="inp-wrap">
+      <input type="number" value={p.v} onChange={function(e){p.c(Number(e.target.value));}} min={p.mn||0} max={p.mx||9999999} step={p.st||1} style={mI(T)}/>
+      {p.s&&<span style={{fontSize:11,color:T.dim,fontWeight:600,fontFamily:FB,marginLeft:2}}>{p.s}</span>}
+    </div>
+  </div>
+);}
+
+/* ─ Select component ─────────────────────────────────────────── */
+function Sel(p){var T=p.T;return(
+  <div style={{display:"flex",flexDirection:"column",gap:3}}>
+    {p.l&&<label style={mL(T)}>{p.l}</label>}
+    <select value={p.v} onChange={function(e){p.c(e.target.value);}} style={{background:T.input,borderRadius:5,padding:"6px 8px",border:"1px solid "+T.border,fontSize:12,fontWeight:600,color:T.text,fontFamily:FB,cursor:"pointer",outline:"none"}}>
+      {p.o.map(function(x){return <option key={x.v} value={x.v}>{x.l}</option>;})}
+    </select>
+  </div>
+);}
+
+/* ─ Checkbox ─────────────────────────────────────────────────── */
+function Chk(p){var T=p.T;return(
+  <label className="chk-label" style={{display:"flex",alignItems:"center",gap:7,cursor:"pointer",fontSize:12,fontWeight:600,color:p.ch?T.text:T.dim,fontFamily:FB}}>
+    <div onClick={function(){p.c(!p.ch);}} style={{width:17,height:17,borderRadius:4,border:p.ch?"2px solid "+T.red:"2px solid "+T.border,background:p.ch?T.red:"transparent",display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0,transition:"all 0.15s"}}>
+      {p.ch&&<span style={{color:"#fff",fontSize:11,fontWeight:900}}>{"\u2713"}</span>}
+    </div>
+    {p.l}
+  </label>
+);}
+
+/* ─ Section card ─────────────────────────────────────────────── */
+function Sec(p){var T=p.T;
+  var gradMust="linear-gradient(135deg,"+T.secMust+" 0%,#AB0534 100%)";
+  var gradNice="linear-gradient(135deg,"+T.secNice+" 0%,#5a5a74 100%)";
+  var bgMap={must:gradMust,nice:gradNice,sub:T.secSub};
+  var txMap={must:"#fff",nice:"#fff",sub:T.text};
+  return(
+    <div className="sec-card" style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden",marginBottom:10,boxShadow:"0 2px 10px rgba(0,0,0,0.05)"}}>
+      <div style={{padding:"10px 16px",background:bgMap[p.type]||T.secSub,display:"flex",alignItems:"center",justifyContent:"space-between"}}>
+        <span style={{fontSize:12,fontWeight:700,color:txMap[p.type]||T.text,fontFamily:FH,letterSpacing:"0.02em",textTransform:"uppercase"}}>{p.t}</span>
+        {p.badge!==undefined&&<span style={{fontSize:9,fontWeight:700,background:"rgba(255,255,255,0.22)",padding:"2px 8px",borderRadius:12,color:txMap[p.type]||T.text,fontFamily:FB,letterSpacing:"0.05em"}}>{p.badge}</span>}
+      </div>
+      <div style={{padding:"10px 16px"}}>{p.children}</div>
+    </div>
+  );
+}
+
+/* ─ Coverage header row ──────────────────────────────────────── */
+function CH(p){var T=p.T;return(
+  <div style={{display:"grid",gridTemplateColumns:G5,gap:4,padding:"4px 0",borderBottom:"2px solid "+T.red,marginBottom:2}}>
+    {["",t("colSugg",p.L),t("colSum",p.L),t("colYrs",p.L),t("colPrem",p.L)].map(function(h,i){
+      return <div key={i} style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase",letterSpacing:"0.06em",textAlign:i>0?"right":"left",fontFamily:FB}}>{h}</div>;
+    })}
+  </div>
+);}
+
+/* ─ Data row with optional editable fields ───────────────────── */
+function DR(p){var T=p.T;var w=mW(T),s={...mI(T),fontSize:11};return(
+  <div className="grid-row" style={{display:"grid",gridTemplateColumns:G5,gap:4,alignItems:"center",padding:"5px 0",borderBottom:"1px solid "+T.bl}}>
+    <div style={{fontWeight:p.b?700:500,color:p.b?T.text:T.dim,fontSize:p.b?12:11,fontFamily:FB}}>{p.l}</div>
+    <div style={{textAlign:"right",fontSize:11,color:T.dim,fontFamily:MN}}>{p.sg!=null?fmt(p.sg)+" \u20ac":""}</div>
+    {p.sc?(<div style={w}><input type="number" value={p.si||0} onChange={function(e){p.sc(Number(e.target.value));}} style={s}/><span style={{fontSize:9,color:T.dim}}>{"\u20ac"}</span></div>):(<div style={{textAlign:"right",fontSize:11,color:T.dim,fontFamily:MN}}>{p.si!=null?fmt(p.si)+" \u20ac":""}</div>)}
+    {p.dc?(<div style={w}><input type="number" value={p.dur||0} onChange={function(e){p.dc(Number(e.target.value));}} min={1} max={80} style={s}/></div>):(<div style={{textAlign:"right",fontSize:11,color:T.dim,fontFamily:MN}}>{p.dur||""}</div>)}
+    <div style={{textAlign:"right",fontSize:12,fontWeight:p.b?700:600,color:p.pr>0.005?T.red:T.dim,fontFamily:MN}}>{p.pr!=null?fmt(p.pr,2)+" \u20ac":""}</div>
+  </div>
+);}
+
+/* ─ Nice-to-have row ─────────────────────────────────────────── */
+function NR(p){var T=p.T;var w=mW(T),s={...mI(T),fontSize:11};return(
+  <div className="grid-row" style={{display:"grid",gridTemplateColumns:G5,gap:4,alignItems:"center",padding:"5px 0",borderBottom:"1px solid "+T.bl}}>
+    <div style={{fontSize:11,color:T.dim,fontFamily:FB}}>{p.l}{p.note?" ("+p.note+")":""}</div>
+    <div></div>
+    <div style={w}><input type="number" value={p.si} onChange={function(e){p.sc(Number(e.target.value));}} min={0} max={p.mx||9999} style={s}/><span style={{fontSize:9,color:T.dim}}>{"\u20ac"}</span></div>
+    <div></div>
+    <div style={{textAlign:"right",fontSize:12,fontWeight:600,color:p.pr>0.005?T.red:T.dim,fontFamily:MN}}>{fmt(p.pr,2)+" \u20ac"}</div>
+  </div>
+);}
+
 
 /* APP */
 export default function App(){
   var _=useState;
   var _d=_(false),dark=_d[0],setDark=_d[1];
-  var _l=_("sk"),lang=_l[0],setLang=_l[1];
+  var _l=_("bg"),lang=_l[0],setLang=_l[1];
   var T=dark?DK:LT;var L=lang;function tx(k){return t(k,L);}
 
   var _br=_(2550),br=_br[0],sBr=_br[1];var _ne=_(2000),ne=_ne[0],sNe=_ne[1];
@@ -243,7 +375,7 @@ export default function App(){
   var _ul=_(true),ul=_ul[0],sUl=_ul[1];var _ulM=_(25),ulM=_ulM[0],sUlM=_ulM[1];
   var _ulDS=_(4000),ulDS=_ulDS[0],sUlDS=_ulDS[1];var _ulDur=_(30),ulDur=_ulDur[0],sUlDur=_ulDur[1];
 
-  var _cp=_("Silver plan"),cp=_cp[0],sCp=_cp[1];
+  var _cp=_("SILVER"),cp=_cp[0],sCp=_cp[1];
   var _cDiD=_(30),cDiD=_cDiD[0],sCDiD=_cDiD[1];
 
   var _aDS=_(0),aDS=_aDS[0],sADS=_aDS[1];var _aDDur=_(30),aDDur=_aDDur[0],sADDur=_aDDur[1];
@@ -255,11 +387,13 @@ export default function App(){
   var _piReal=_(93),piReal=_piReal[0],sPiReal=_piReal[1];
   var _tab=_("model"),tab=_tab[0],sTab=_tab[1];
 
+  var _embO=_(""),embO=_embO[0],sEmbO=_embO[1];
+
   var rc=RCT[rk]||RCT[1];
-  var calc=useMemo(function(){return calcAll(br,ne,age,dur,iy/100,py/100,pyr,st,loan,ul,ulM,cg,cgDD,cgS,cp,cgD);},[br,ne,age,dur,iy,py,pyr,st,loan,ul,ulM,cg,cgDD,cgS,cp,cgD]);
+  var calc=useMemo(function(){return calcAll(br,ne,age,dur,iy/100,py/100,pyr,st,loan,ul,ulM,cg,cgDD,cgS,cp,cgD,embO);},[br,ne,age,dur,iy,py,pyr,st,loan,ul,ulM,cg,cgDD,cgS,cp,cgD,embO]);
   var mPI=calc.monthlyPI;
-  var careVals=CARE_PLANS[cp]||CARE_PLANS["not included"];
-  var careActive=cp!=="not included";
+  var careVals=CARE_PLANS[cp]||CARE_PLANS["NONE"];
+  var careActive=cp!=="NONE";
 
   /* Premiums */
   var cgRate=lr(cgDD?DD:DOT,age,cgD);var cgPr=cg?(cgS/100000)*cgRate*12:0;
@@ -295,262 +429,360 @@ export default function App(){
   var investOnInc=ne>0?((ulYr+piReal*12)/12/ne):0;
   var riskOnInc=ne>0?rP/(ne*12):0;
 
-  var btnS=function(a){return{padding:"3px 8px",borderRadius:4,border:"1px solid "+(a?"#AB0534":T.border),background:a?"#AB0534":"transparent",color:a?"#fff":T.dim,fontSize:9,fontWeight:700,cursor:"pointer",fontFamily:"Arial,sans-serif"};};
+  var btnS=function(a){return{
+    padding:"4px 10px",borderRadius:5,
+    border:"1px solid "+(a?T.red:T.border),
+    background:a?T.red:"transparent",
+    color:a?"#fff":T.dim,
+    fontSize:10,fontWeight:700,cursor:"pointer",fontFamily:FB,
+    transition:"all 0.15s"
+  };};
 
   return(
-    <div style={{fontFamily:"Arial,Helvetica,sans-serif",background:T.bg,color:T.text,minHeight:"100vh"}}>
-      <div style={{borderTop:"4px solid #AB0534",background:T.hbg,padding:"12px 16px",borderBottom:"1px solid "+T.border}}>
-        <div style={{maxWidth:960,margin:"0 auto",display:"flex",alignItems:"center",justifyContent:"space-between",flexWrap:"wrap",gap:8}}>
-          <div style={{display:"flex",alignItems:"center",gap:10}}>
-            <svg width="30" height="30" viewBox="0 0 30 30"><rect width="30" height="30" rx="4" fill="#AB0534"/><text x="15" y="21" textAnchor="middle" fontFamily="Arial" fontWeight="900" fontSize="18" fill="#fff">P</text></svg>
-            <div><div style={{fontSize:16,fontWeight:700,color:T.text,letterSpacing:"0.12em",textTransform:"uppercase"}}>P<span style={{color:"#AB0534"}}>A</span>RTNERS</div><div style={{fontSize:9,color:T.dim}}>{tx("title")+" \u2022 BG 3/2026"}</div></div>
+    <div style={{fontFamily:FB,background:T.bg,color:T.text,minHeight:"100vh"}}>
+      {/* ─ HEADER ─────────────────────────────────────────────── */}
+      <div style={{background:T.card,padding:"0 24px",borderBottom:"1px solid "+T.border,marginBottom:30}}>
+        <div className="top-bar-content" style={{maxWidth:1440,margin:"0 auto",height:64,justifyContent:"space-between"}}>
+          
+          <div style={{display:"flex",alignItems:"center",gap:40}}>
+            {/* Logo/Avatar - PARTNERS wordmark podľa manuálu doplneny o symbol */}
+            <div style={{display:"flex",alignItems:"center",gap:16}}>
+              <svg width="34" height="34" viewBox="0 0 34 34" style={{borderRadius:4}}><rect width="34" height="34" fill={T.red}/><polygon points="12,24 16,24 21,10 17,10" fill="#fff"/><polygon points="22,14 26,24 22,24 19.5,18" fill="#fff"/></svg>
+              <div style={{display:"flex",flexDirection:"column"}}>
+              <div style={{fontSize:22,fontWeight:900,color:T.text,letterSpacing:"0.06em",fontFamily:FH, display:"flex", alignItems:"center"}}>
+                P
+                <svg width="0.75em" height="0.75em" viewBox="0 0 24 24" style={{fill:"currentColor", margin:"0 0.04em 0 0.05em", transform:"translateY(0.02em)"}}>
+                  <polygon points="1,24 8,24 17,0 10,0" />
+                  <polygon points="17,8 24,24 17,24 12,12" />
+                </svg>
+                RTNERS
+              </div>
+              <div style={{fontSize:9,color:T.dim,fontFamily:FB,marginTop:2,letterSpacing:"0.02em"}}>{tx("title")+" \u2022 BG 3/2026"}</div>
+              </div>
+            </div>
+            {/* TABS removed from here */}
           </div>
+
           <div style={{display:"flex",alignItems:"center",gap:6}}>
-            {["sk","en","bg"].map(function(lg){return <button key={lg} className="lang-btn" onClick={function(){setLang(lg);}} style={btnS(lang===lg)}>{lg.toUpperCase()}</button>;})}
-            <div style={{width:1,height:16,background:T.border,margin:"0 2px"}}></div>
+            {["bg","sk","en"].map(function(lg){return <button key={lg} className="lang-btn" onClick={function(){setLang(lg);}} style={btnS(lang===lg)}>{lg.toUpperCase()}</button>;})}
+            <div style={{width:1,height:18,background:T.border,margin:"0 4px"}}></div>
             <button className="lang-btn" onClick={function(){setDark(!dark);}} style={btnS(false)}>{dark?tx("light"):tx("dark")}</button>
           </div>
         </div>
       </div>
 
-      <div style={{maxWidth:960,margin:"0 auto",padding:"14px 10px 40px"}}>
-        {/* INPUTS */}
-        <div style={{background:T.card,borderRadius:8,padding:"12px 14px",border:"1px solid "+T.border,marginBottom:10}}>
-          <div style={{...mL(T),color:T.red,marginBottom:8}}>{tx("inputs")}</div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:5}}>
-            <div style={{display:"flex",flexDirection:"column",gap:5}}>
-              <Inp T={T} l={tx("brutto")} v={br} c={sBr} s={"\u20ac"}/>
-              <Inp T={T} l={tx("netto")} v={ne} c={sNe} s={"\u20ac"}/>
-            </div>
-            <div style={{display:"flex",flexDirection:"column",gap:5}}>
-              <Inp T={T} l={tx("age")} v={age} c={sAge} s="r." mn={18} mx={65}/>
-              <Inp T={T} l={tx("dur")} v={dur} c={sDur} s="r." mn={1} mx={45}/>
-            </div>
-            <div style={{display:"flex",flexDirection:"column",gap:5}}>
-              <Sel T={T} l={tx("status")} v={st} c={sSt} o={[{v:"SINGLE",l:tx("single")},{v:"COUPLE",l:tx("couple")}]}/>
-              <Sel T={T} l={tx("riskClass")} v={String(rk)} c={function(v){sRk(Number(v));}} o={[{v:"1",l:"1 - "+tx("low")},{v:"2",l:"2 - "+tx("medium")},{v:"3",l:"3 - "+tx("high")}]}/>
-            </div>
-            <div style={{display:"flex",flexDirection:"column",gap:5}}>
-              <Inp T={T} l={tx("invYield")} v={iy} c={sIy} s="%" st={0.5}/>
-              <Inp T={T} l={tx("penYield")} v={py} c={sPy} s="%" st={0.5}/>
-            </div>
-            <div style={{display:"flex",flexDirection:"column",gap:5}}>
-              <Inp T={T} l={tx("penYears")} v={pyr} c={sPyr} s="r."/>
-              <Inp T={T} l={tx("loan")} v={loan} c={sLoan} s={"\u20ac"}/>
+      <div className="app-container">
+        
+        {/* TABS NAD STREDNOU TABULKOU */}
+        <div className="main-grid" style={{marginBottom: 20, alignItems: "center"}}>
+          <div>
+            {/* Title can stay in the left col or be hidden, let's keep it here aligned cleanly */}
+            <h1 style={{fontSize:22,fontWeight:800,fontFamily:FH,color:T.text}}>
+              {tab==="overview"?tx("tabIncomeSecHeader"):tab==="invest"?tx("tabInvestCapHeader"):tx("tabCoverModelHeader")}
+            </h1>
+          </div>
+          
+          {/* TABS CENTERED OVER MAIN COLUMN */}
+          <div style={{display:"flex",justifyContent:"center"}}>
+            <div style={{display:"inline-flex",gap:4,background:T.card,padding:5,borderRadius:12,border:"1px solid "+T.border,boxShadow:"0 3px 12px rgba(0,0,0,0.03)"}}>
+              {[{id:"model",k:"tabModel"},{id:"overview",k:"tabOverview"},{id:"invest",k:"tabInvest"}].map(function(tb){
+                var a=tab===tb.id;
+                return <button key={tb.id} onClick={function(){sTab(tb.id);}} style={{
+                  padding:"10px 24px",border:"none",borderRadius:8,cursor:"pointer",
+                  background:a?T.red:"transparent",
+                  color:a?"#fff":T.dim,fontSize:13,fontWeight:800,fontFamily:FH,letterSpacing:"0.03em",
+                  textTransform: "uppercase", transition: "all 0.2s ease",
+                  boxShadow:a?"0 4px 10px rgba(139,21,56,0.25)":"none"
+                }}>{tx(tb.k)}</button>;
+              })}
             </div>
           </div>
+          
+          <div></div> {/* right col spacer */}
         </div>
 
-        {/* TABS */}
-        <div style={{display:"flex",marginBottom:12,background:T.card,borderRadius:8,overflow:"hidden",border:"1px solid "+T.border}}>
-          {[{id:"model",k:"tabModel"},{id:"overview",k:"tabOverview"},{id:"invest",k:"tabInvest"}].map(function(tb,i){var a=tab===tb.id;return <button key={tb.id} className="tab-btn" onClick={function(){sTab(tb.id);}} style={{flex:1,padding:"10px 4px",border:"none",cursor:"pointer",background:a?(dark?T.secSub:"#fdf0f2"):T.card,color:a?T.red:T.dim,fontSize:11,fontWeight:700,fontFamily:"Arial,sans-serif",borderBottom:a?"3px solid "+T.red:"3px solid transparent",borderRight:i<2?"1px solid "+T.border:"none"}}>{tx(tb.k)}</button>;})}
-        </div>
+        <div className="main-grid">
+          
+          {/* LFT COLUMN: VSTUPNÉ ÚDAJE (Fixný pre vš. taby) */}
+          <aside>
+            <div style={{background:T.card,borderRadius:8,padding:"16px 18px",boxShadow:"0 2px 10px rgba(0,0,0,0.02)",border:"1px solid "+T.border}}>
+              <div style={{...mL(T),color:T.red,marginBottom:14,fontSize:11}}>{tx("inputs")}</div>
+              
+              <div style={{display:"flex",flexDirection:"column",gap:12}}>
+                <Inp T={T} l={tx("brutto")} v={br} c={sBr} s={"\u20ac"}/>
+                <Inp T={T} l={tx("netto")} v={ne} c={sNe} s={"\u20ac"}/>
+                
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                  <Inp T={T} l={tx("age")} v={age} c={sAge} s="r." mn={18} mx={65}/>
+                  <Inp T={T} l={tx("dur")} v={dur} c={sDur} s="r." mn={1} mx={45}/>
+                </div>
+                
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                  <Sel T={T} l={tx("status")} v={st} c={sSt} o={[{v:"SINGLE",l:tx("single")},{v:"COUPLE",l:tx("couple")}]}/>
+                  <Sel T={T} l={tx("riskClass")} v={String(rk)} c={function(v){sRk(Number(v));}} o={[{v:"1",l:"1 - "+tx("low")},{v:"2",l:"2 - "+tx("medium")},{v:"3",l:"3 - "+tx("high")}]}/>
+                </div>
+                
+                <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
+                  <Inp T={T} l={tx("invYield")} v={iy} c={sIy} s="%" st={0.5}/>
+                  <Inp T={T} l={tx("penYield")} v={py} c={sPy} s="%" st={0.5}/>
+                </div>
+                
+                <Inp T={T} l={tx("penYears")} v={pyr} c={sPyr} s="r."/>
+                <Inp T={T} l={tx("loan")} v={loan} c={sLoan} s={"\u20ac"}/>
+              </div>
+            </div>
+            
+            <div style={{marginTop:16,fontSize:10,color:T.dim,lineHeight:1.5,fontFamily:FB,padding:"0 10px"}}>
+              {tx("descModel")}
+            </div>
+          </aside>
 
-        {/* MODEL */}
-        {tab==="model"&&(<div>
-          <Sec T={T} t={tx("mustHave")} type="must">
-            <Sec T={T} t={tx("investPart")} type="sub">
-              {function(){
-                /* Compute real sum FV and pension */
-                var piRealFV=fvDaily(piReal,iy/100,dur);
-                var piRealTotal=piRealFV+(calc.ulSavings||0);
-                var pvF=calc.pvF||1;
-                var piRealPension=pvF>0?piRealTotal/pvF:0;
-                var piSugFV=calc.piTarget;
-                var piSugTotal=piSugFV+(calc.ulSavings||0);
-                var piSugPension=pvF>0?piSugTotal/pvF:0;
-                var w=mW(T),si={...mI(T),fontSize:12};
-                return(
-                  <div>
-                    {/* header */}
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 90px 90px 80px 80px",gap:4,padding:"3px 0",borderBottom:"2px solid "+T.red,marginBottom:2}}>
-                      <div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase"}}>PI</div>
-                      <div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("colSugg")}</div>
-                      <div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("realSum")}</div>
-                      <div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("pension")}</div>
-                      <div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("month")}</div>
-                    </div>
-                    {/* add in PI row */}
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 90px 90px 80px 80px",gap:4,alignItems:"center",padding:"5px 0",borderBottom:"1px solid "+T.bl}}>
-                      <div style={{fontSize:11,fontWeight:600,color:T.text}}>{tx("addPI")}</div>
-                      <div style={{textAlign:"right",fontSize:12,fontWeight:700,color:T.red,fontFamily:MN}}>{fmt(mPI,2)+" \u20ac"}</div>
-                      <div style={w}><input type="number" value={piReal} onChange={function(e){sPiReal(Number(e.target.value));}} min={0} style={si}/><span style={{fontSize:8,color:T.dim}}>{"\u20ac"}</span></div>
-                      <div style={{textAlign:"right",fontSize:12,fontWeight:700,color:"#22863a",fontFamily:MN}}>{fmt(Math.round(piRealPension))+" \u20ac"}</div>
-                      <div style={{textAlign:"right",fontSize:12,fontWeight:600,color:T.text,fontFamily:MN}}>{fmt(piReal,2)+" \u20ac"}</div>
-                    </div>
-                    {/* Sum row */}
-                    <div style={{display:"grid",gridTemplateColumns:"1fr 90px 90px 80px 80px",gap:4,alignItems:"center",padding:"5px 0"}}>
-                      <div style={{fontSize:11,fontWeight:600,color:T.text}}>Sum</div>
-                      <div style={{textAlign:"right",fontSize:12,fontWeight:700,color:T.text,fontFamily:MN}}>{fmt(Math.round(piSugFV))+" \u20ac"}</div>
-                      <div style={{textAlign:"right",fontSize:12,fontWeight:700,color:T.text,fontFamily:MN}}>{fmt(Math.round(piRealFV))+" \u20ac"}</div>
-                      <div></div>
-                      <div></div>
-                    </div>
+          {/* ─ OVERVIEW ───────────────────────────────────────────── */}
+          {tab==="overview"&&(<>
+            <div className="center-col">
+              <Sec T={T} t={tx("overviewLossComp")} type="must">
+                <div style={{padding:"6px 0"}}>
+                  {[{k:"dis50",v:calc.d50},{k:"dis70",v:calc.d70},{k:"dis90",v:calc.d90},{k:"pension",v:calc.pen}].map(function(r,i){
+                    var lossGap=Math.max(0,Math.round(r.v.gap));
+                    return <div key={i} style={{padding:"10px 0",borderBottom:"1px solid "+T.bl}}>
+                      <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:8}}>
+                        <span style={{fontSize:12,color:T.dim,fontFamily:FB}}>{tx(r.k)}</span>
+                        <div style={{textAlign:"right"}}>
+                           <span style={{fontSize:10,color:T.dim,fontFamily:FB,marginRight:8}}>{tx("overviewLossLbl")}</span>
+                           <span style={{fontSize:15,fontWeight:800,color:T.red,fontFamily:MN}}>{fmt(lossGap)+" \u20ac"}</span>
+                        </div>
+                      </div>
+                      <div className="progress-track">
+                        <div className="progress-fill" style={{width:Math.min(Math.max((1-r.v.pct)*100,0),100)+"%"}}></div>
+                      </div>
+                      <div style={{display:"flex",justifyContent:"space-between",marginTop:6}}>
+                         <span style={{fontSize:10,color:T.dim,fontFamily:FB}}>{((1-r.v.pct)*100).toFixed(0)+"% "+tx("incomeStrata")}</span>
+                         <span style={{fontSize:10,color:T.dim,fontFamily:FB}}>{(r.v.pct*100).toFixed(0)+"% "+tx("withIncome")}</span>
+                      </div>
+                    </div>;
+                  })}
+                </div>
+              </Sec>
+
+              {/* Dolný blok pre Potrebné úspory */}
+              <div style={{marginTop:24,padding:"16px",background:T.card,borderRadius:8,border:"1px solid "+T.border}}>
+                <h3 style={{fontFamily:FB,fontSize:14,color:T.dim,marginBottom:6}}>{tx("neededSav")}</h3>
+                <div style={{fontSize:38,fontWeight:800,color:T.red,fontFamily:MN}}>{fmt(Math.round(calc.needed))+" \u20ac"}</div>
+                <p style={{fontSize:12,color:T.dim,fontFamily:FB,marginTop:10,lineHeight:1.4}}>
+                  {tx("overviewLongText")}
+                </p>
+                <div style={{marginTop:16}}><button style={{background:T.red,color:"#fff",border:"none",padding:"10px 20px",borderRadius:6,fontFamily:FB,fontWeight:700,fontSize:12,cursor:"pointer",boxShadow:"0 4px 10px rgba(139,21,56,0.3)"}}>{tx("btnDetailRenty")}</button></div>
+              </div>
+            </div>
+
+            <div className="right-col">
+              <div className="totals-card" style={{borderRadius:8,padding:"26px 22px"}}>
+                <h2 style={{fontSize:13,fontWeight:800,fontFamily:FH,marginBottom:24,color:"#fff",letterSpacing:"0.04em"}}>
+                  {tx("remaining")} <span style={{opacity:0.6,fontWeight:500,fontSize:11,display:"block",marginTop:4}}>{tx("lblRemAtLoss")}</span>
+                </h2>
+                
+                <div style={{background:"rgba(255,255,255,0.1)",borderRadius:6,padding:"12px 14px",marginBottom:20}}>
+                   <div style={{fontSize:10,fontFamily:FB,opacity:0.8,marginBottom:4}}>{tx("netIncome")}</div>
+                   <div style={{fontSize:24,fontWeight:800,fontFamily:MN}}>{fmt(ne)+" \u20ac"}</div>
+                </div>
+
+                <div style={{display:"flex",flexDirection:"column",gap:16}}>
+                  {[{k:"dis50",v:calc.d50.repl},{k:"dis70",v:calc.d70.repl},{k:"dis90",v:calc.d90.repl},{k:"pension",v:calc.pen.repl}].map(function(r,i){
+                    return <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:i<3?"1px solid rgba(255,255,255,0.15)":"none",paddingBottom:i<3?12:0}}>
+                      <span style={{fontSize:12,fontFamily:FB,opacity:0.9,color:"#fff"}}>{tx(r.k)}</span>
+                      <span style={{fontSize:15,fontWeight:700,fontFamily:MN,color:"#fff"}}>{fmt(Math.round(r.v))+" \u20ac"}</span>
+                    </div>;
+                  })}
+                </div>
+              </div>
+            </div>
+          </>)}
+
+          {/* ─ INVEST ─────────────────────────────────────────────── */}
+          {tab==="invest"&&(<div style={{gridColumn:"span 2",display:"grid",gridTemplateColumns:"1fr 1fr",gap:24,alignItems:"start"}}>
+              <div>
+                <Sec T={T} t={tx("investAnalTitle")} type="must">
+                  <div style={{padding:"8px 0"}}>
+                    {[{l:tx("neededSav"),v:fmt(Math.round(calc.needed))+" \u20ac",c:T.text},{l:tx("savML"),v:fmt(Math.round(calc.ulSavings))+" \u20ac",c:T.text},{l:tx("investCiel")+" ("+tx("colSugg")+")",v:fmt(Math.round(calc.piTarget))+" \u20ac",c:T.red},{l:tx("monthlyDep")+" ("+tx("colSugg")+")",v:fmt(mPI,2)+" \u20ac",c:T.dim},{l:tx("monthlyDep")+" ("+tx("realSum")+")",v:fmt(piReal,2)+" \u20ac",c:T.red},{l:tx("estYield"),v:iy+" %",c:T.text},{l:tx("investDur"),v:dur+" "+tx("years"),c:T.text},{l:tx("totalDep"),v:fmt(Math.round(piReal*dur*12))+" \u20ac",c:T.dim}].map(function(r,i){
+                      return <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid "+T.bl}}>
+                        <span style={{fontSize:12,color:T.dim,fontFamily:FB}}>{r.l}</span>
+                        <span style={{fontSize:14,fontWeight:700,color:r.c,fontFamily:MN}}>{r.v}</span>
+                      </div>;
+                    })}
                   </div>
-                );
-              }()}
-            </Sec>
-
-            {/* Credit Guard */}
-            <Sec T={T} t="Metlife Credit Guard" type="sub">
-              <div style={{display:"flex",gap:14,alignItems:"center",marginBottom:8,flexWrap:"wrap"}}>
-                <Chk T={T} l={tx("activate")} ch={cg} c={sCg}/>
-                {cg&&<Sel T={T} v={cgDD?"dd":"d"} c={function(v){sCgDD(v==="dd");}} o={[{v:"d",l:tx("deathOnly")},{v:"dd",l:tx("deathDis")}]}/>}
+                </Sec>
+                
+                <Sec T={T} t={tx("investPart")} type="must">
+                {function(){
+                  var piRealFV=fvDaily(piReal,iy/100,dur);
+                  var pvF=calc.pvF||1;
+                  var piRealPension=pvF>0?(piRealFV+(calc.ulSavings||0))/pvF:0;
+                  var w=mW(T),si={...mI(T),fontSize:12};
+                  return(
+                    <div style={{padding:"4px 0"}}>
+                      <div style={{display:"grid",gridTemplateColumns:"1fr 80px 80px 80px",gap:6,padding:"4px 0",borderBottom:"2px solid "+T.red,marginBottom:6}}>
+                        <div style={{fontSize:9,fontWeight:700,color:T.dim,textTransform:"uppercase"}}>PI</div>
+                        <div style={{fontSize:9,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("realSum")}</div>
+                        <div style={{fontSize:9,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("pension")}</div>
+                        <div style={{fontSize:9,fontWeight:700,color:T.dim,textTransform:"uppercase",textAlign:"right"}}>{tx("month")}</div>
+                      </div>
+                      <div style={{display:"grid",gridTemplateColumns:"1fr 80px 80px 80px",gap:6,alignItems:"center",padding:"8px 0"}}>
+                        <div style={{fontSize:12,fontWeight:600,color:T.text}}>{tx("addPI")}</div>
+                        <div style={w}><input type="number" value={piReal} onChange={function(e){sPiReal(Number(e.target.value));}} min={0} style={si}/><span style={{fontSize:9,color:T.dim}}>{"\u20ac"}</span></div>
+                        <div style={{textAlign:"right",fontSize:13,fontWeight:700,color:"#22863a",fontFamily:MN}}>{fmt(Math.round(piRealPension))+" \u20ac"}</div>
+                        <div style={{textAlign:"right",fontSize:13,fontWeight:600,color:T.text,fontFamily:MN}}>{fmt(piReal,2)+" \u20ac"}</div>
+                      </div>
+                    </div>
+                  );
+                }()}
+              </Sec>
               </div>
-              {cg&&<div><CH T={T} L={L}/><DR T={T} l={cgDD?tx("deathAndDis"):tx("death")} sg={calc.sugCGDeath} si={cgS} sc={sCgS} dur={cgD} dc={sCgD} pr={cgPr} b={true}/></div>}
-            </Sec>
 
-            {/* Metlife UL */}
-            <Sec T={T} t="Metlife" type="sub" badge={ul?"WITH UL":"BEZ UL"}>
-              <div style={{marginBottom:8}}><Chk T={T} l={tx("withUL")} ch={ul} c={sUl}/></div>
-              {ul&&(<div>
-                <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(110px,1fr))",gap:5,marginBottom:8,padding:"6px 8px",background:T.input,borderRadius:6,border:"1px solid "+T.border}}>
-                  <Inp T={T} l={tx("investUL")+" (min 25\u20ac)"} v={ulM} c={sUlM} s={"\u20ac/m"} mn={25}/>
-                  <div><div style={mL(T)}>{tx("savML")}</div><div style={{fontSize:12,fontWeight:700,color:T.text,fontFamily:MN,marginTop:4}}>{fmt(Math.round(calc.ulSavings))+" \u20ac"}</div></div>
-                  <div><div style={mL(T)}>{tx("embDeath")}</div><div style={{fontSize:12,fontWeight:700,color:T.dim,fontFamily:MN,marginTop:4}}>{fmt(Math.round(calc.embDeath))+" \u20ac"}</div></div>
+              <div>
+                <div style={{background:T.card,borderRadius:8,padding:"22px",border:"1px solid "+T.border,marginBottom:24,boxShadow:"0 4px 18px rgba(0,0,0,0.04)"}}>
+                   <div style={{fontSize:11,fontWeight:700,color:T.dim,fontFamily:FH,textTransform:"uppercase",letterSpacing:"0.04em",marginBottom:10}}>{tx("fvInvestment")}</div>
+                   <div style={{fontSize:42,fontWeight:800,color:T.red,fontFamily:MN,lineHeight:1.1,marginBottom:16}}>
+                      {fmt(Math.round(fvDaily(piReal,iy/100,dur)))} <span style={{fontSize:24}}>€</span>
+                   </div>
+                   <div style={{display:"flex",gap:16,borderTop:"1px solid "+T.bl,paddingTop:14}}>
+                      <div>
+                         <div style={{fontSize:10,color:T.dim,fontFamily:FB,marginBottom:2}}>{tx("appreciation")}</div>
+                         <div style={{fontSize:14,fontWeight:700,color:"#22863a",fontFamily:MN}}>+{fmt(Math.max(0,Math.round(fvDaily(piReal,iy/100,dur)-piReal*dur*12)))} €</div>
+                      </div>
+                      <div>
+                         <div style={{fontSize:10,color:T.dim,fontFamily:FB,marginBottom:2}}>{tx("monthlyDep")}</div>
+                         <div style={{fontSize:14,fontWeight:700,color:T.text,fontFamily:MN}}>{fmt(piReal,2)} €</div>
+                      </div>
+                   </div>
                 </div>
-                <CH T={T} L={L}/><DR T={T} l={tx("death")} sg={calc.sugULDeath} si={ulDS} sc={sUlDS} dur={ulDur} dc={sUlDur} pr={ulDeathPr} b={true}/>
-              </div>)}
-            </Sec>
 
-            {/* CARE */}
-            <Sec T={T} t="Metlife CARE" type="sub" badge={careActive?cp:"not included"}>
-              <div style={{marginBottom:8}}>
-                <Sel T={T} l={tx("carePlan")} v={cp} c={sCp} o={Object.keys(CARE_PLANS).map(function(k){return{v:k,l:k};})}/>
+                <Sec T={T} t={tx("yearlyOverview")} type="must">
+                  <table style={{width:"100%",borderCollapse:"collapse",fontSize:12}}>
+                    <thead><tr style={{borderBottom:"2px solid "+T.red}}>
+                      {[tx("year"),tx("depTotal"),tx("futureVal"),tx("profit")].map(function(h,i){return <th key={i} style={{padding:"8px 4px",textAlign:"right",fontSize:9,fontWeight:700,color:T.dim,textTransform:"uppercase",letterSpacing:"0.06em"}}>{h}</th>;})}
+                    </tr></thead>
+                    <tbody>{[5,10,15,20,25,30].filter(function(y){return y<=dur;}).map(function(yr){
+                      var dep=piReal*yr*12;var val=fvDaily(piReal,iy/100,yr);var p=val-dep;
+                      return <tr key={yr} style={{borderBottom:"1px solid "+T.bl}}>
+                        <td style={{padding:"8px 4px",textAlign:"right",fontWeight:700,color:T.text,fontFamily:MN}}>{yr}</td>
+                        <td style={{padding:"8px 4px",textAlign:"right",fontFamily:MN,color:T.dim}}>{fmt(Math.round(dep))}</td>
+                        <td style={{padding:"8px 4px",textAlign:"right",fontFamily:MN,fontWeight:700,color:T.red}}>{fmt(Math.round(val))}</td>
+                        <td style={{padding:"8px 4px",textAlign:"right",fontFamily:MN,color:p>=0?"#22863a":T.text}}>+{fmt(Math.round(p))}</td>
+                      </tr>;
+                    })}</tbody>
+                  </table>
+                </Sec>
               </div>
-              {careActive&&(<div><CH T={T} L={L}/>
-                <DR T={T} l={tx("disTEMC")} si={careVals[0]} dur={cDiD} dc={sCDiD} pr={cDisPr}/>
-                <DR T={T} l={tx("permDis")} si={careVals[1]} dur={cDiD} pr={cPDPr}/>
-                <DR T={T} l={tx("ci40")} si={careVals[2]} pr={cCIPr}/>
-                <DR T={T} l={tx("cancer")} si={careVals[3]} pr={cCaPr}/>
-                <DR T={T} l={tx("insitu")} si={careVals[4]} pr={cInPr}/>
-                <div style={{padding:"4px 0",fontSize:10,color:careVals[5]?T.red:T.dim}}>{tx("teleCare")+": "+(careVals[5]?"Included":"not Included")}</div>
-              </div>)}
-            </Sec>
+          </div>)}
 
-            {/* Standalone */}
-            <CH T={T} L={L}/>
-            <DR T={T} l={tx("accDeath")} si={aDS} sc={sADS} dur={aDDur} dc={sADDur} pr={aDPr} b={true}/>
-            <DR T={T} l={tx("permCons")} sg={calc.sugPermDis} si={pDS} sc={sPDS} dur={pDDur} dc={sPDDur} pr={pDPr} b={true}/>
-            <DR T={T} l={tx("critIll")} sg={calc.sugCI} si={ciS} sc={sCiS} dur={ciDur} dc={sCiDur} pr={ciPr} b={true}/>
-          </Sec>
+          {/* ─ MODEL POISTENIA ──────────────────────────────────── */}
+          {tab==="model"&&(<>
+            <div className="center-col">
+              <Sec T={T} t={tx("tabCoverHeaderRizik")} type="must">
+                {/* Credit Guard */}
+                <div style={{padding:"0 0 12px",borderBottom:"1px solid "+T.bl,marginBottom:12}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                     <span style={{fontSize:13,fontWeight:700,color:T.text,fontFamily:FH}}>{tx("cgTitle")}</span>
+                     <div style={{display:"flex",gap:12}}>
+                        <Chk T={T} l={tx("activate")} ch={cg} c={sCg}/>
+                        {cg&&<Sel T={T} v={cgDD?"dd":"d"} c={function(v){sCgDD(v==="dd");}} o={[{v:"d",l:tx("deathOnly")},{v:"dd",l:tx("deathDis")}]}/>}
+                     </div>
+                  </div>
+                  {cg&&<div><CH T={T} L={L}/><DR T={T} l={cgDD?tx("deathAndDis"):tx("death")} sg={calc.sugCGDeath} si={cgS} sc={sCgS} dur={cgD} dc={sCgD} pr={cgPr} b={true}/></div>}
+                </div>
 
-          {/* Nice to have */}
-          <Sec T={T} t={tx("niceHave")} type="nice">
-            <NR T={T} l={tx("hospital")} note={"5-300\u20ac"} si={hS} sc={sHS} pr={hPr} mx={300}/>
-            <NR T={T} l={tx("surgical")} note={"150-5000\u20ac"} si={sS} sc={sSS} pr={sPr} mx={5000}/>
-            <NR T={T} l={tx("fractures")} note={"500-1500\u20ac"} si={fS} sc={sFS} pr={fPr} mx={1500}/>
-            <div style={{padding:"6px 0",display:"flex",gap:14,flexWrap:"wrap"}}>
-              <Chk T={T} l={tx("telemed")+" (+15\u20ac)"} ch={telOn} c={sTelOn}/>
-              <Chk T={T} l={tx("waiver")} ch={wavOn} c={sWavOn}/>
-            </div>
-            {wavOn&&(<div style={{display:"grid",gridTemplateColumns:G5,gap:3,alignItems:"center",padding:"4px 0",borderBottom:"1px solid "+T.bl}}>
-              <div style={{fontWeight:600,color:T.text,fontSize:11}}>{tx("waiver")}</div>
-              <div style={{textAlign:"right",fontSize:10,color:T.dim,fontFamily:MN}}>{fmt(riskSum+ulYr,2)+" \u20ac"}</div>
-              <div style={{textAlign:"right",fontSize:10,color:T.dim,fontFamily:MN}}>{fmt(riskSum+ulYr,2)+" \u20ac"}</div>
-              <div style={{textAlign:"center",fontSize:9,color:T.red,fontWeight:700}}>yes</div>
-              <div style={{textAlign:"right",fontSize:11,fontWeight:700,color:T.red,fontFamily:MN}}>{fmt(wvPr,2)+" \u20ac"}</div>
-            </div>)}
-            <div style={{display:"grid",gridTemplateColumns:G5,gap:3,alignItems:"center",padding:"4px 0"}}>
-              <div style={{fontSize:10,color:T.dim}}>Fee</div><div></div><div></div><div></div>
-              <div style={{textAlign:"right",fontSize:11,color:T.dim,fontFamily:MN}}>{fmt(fee,2)+" \u20ac"}</div>
-            </div>
-          </Sec>
+                {/* Metlife UL */}
+                <div style={{padding:"0 0 12px",borderBottom:"1px solid "+T.bl,marginBottom:12}}>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                     <span style={{fontSize:13,fontWeight:700,color:T.text,fontFamily:FH}}>{tx("tabCoverHeaderMetlifeHlavne")}</span>
+                     <Chk T={T} l={tx("withUL")} ch={ul} c={sUl}/>
+                  </div>
+                  {ul&&(<div>
+                    <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:12,padding:"10px",background:T.input,borderRadius:6,border:"1px solid "+T.border}}>
+                      <Inp T={T} l={tx("investUL")+" "+tx("min25")} v={ulM} c={sUlM} s={"\u20ac/m"} mn={25}/>
+                      <div><div style={mL(T)}>{tx("savML")}</div><div style={{fontSize:13,fontWeight:700,color:T.text,fontFamily:MN,marginTop:4}}>{fmt(Math.round(calc.ulSavings))+" \u20ac"}</div></div>
+                      <Inp T={T} l={tx("embDeath")} v={embO!==""?embO:Math.round(calc.embDeath)} c={sEmbO} s={"\u20ac"}/>
+                    </div>
+                    <CH T={T} L={L}/><DR T={T} l={tx("death")} sg={calc.sugULDeath} si={ulDS} sc={sUlDS} dur={ulDur} dc={sUlDur} pr={ulDeathPr} b={true}/>
+                  </div>)}
+                </div>
 
-          {/* Totals */}
-          <div className="totals-card" style={{background:T.totBg,borderRadius:8,padding:"14px 16px",border:"2px solid "+T.totBdr,position:"relative"}}>
-            <div style={{position:"absolute",top:-2,left:-2,width:24,height:24,borderTop:"3px solid "+T.totBdr,borderLeft:"3px solid "+T.totBdr,borderRadius:"8px 0 0 0"}}></div>
-            <div style={{position:"absolute",bottom:-2,right:-2,width:24,height:24,borderBottom:"3px solid "+T.totBdr,borderRight:"3px solid "+T.totBdr,borderRadius:"0 0 8px 0"}}></div>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",padding:"2px 0"}}><span style={{fontSize:11,fontWeight:600,color:T.dim}}>{tx("totalYearly")}</span><span style={{fontSize:20,fontWeight:800,color:T.text,fontFamily:MN}}>{fmt(tY,2)+" \u20ac"}</span></div>
-            <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",padding:"2px 0"}}><span style={{fontSize:11,fontWeight:600,color:T.dim}}>{tx("riskPart")}</span><span style={{fontSize:14,fontWeight:700,color:T.red,fontFamily:MN}}>{fmt(rP,2)+" \u20ac"}</span></div>
-            <div style={{borderTop:"1px solid "+T.border,marginTop:8,paddingTop:8,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8}}>
-              <div><div style={{fontSize:8,color:T.dim,fontWeight:700,textTransform:"uppercase"}}>Risk part</div><div style={{fontSize:15,fontWeight:800,color:"#AB0534",fontFamily:MN}}>{tY>0?((rP/tY)*100).toFixed(0)+"%":"0%"}</div></div>
-              <div><div style={{fontSize:8,color:T.dim,fontWeight:700,textTransform:"uppercase"}}>{tx("investInc")}</div><div style={{fontSize:15,fontWeight:800,color:dark?T.text:T.blue,fontFamily:MN}}>{(investOnInc*100).toFixed(1)+"%"}</div></div>
-              <div><div style={{fontSize:8,color:T.dim,fontWeight:700,textTransform:"uppercase"}}>{tx("riskInc")}</div><div style={{fontSize:15,fontWeight:800,color:T.dim,fontFamily:MN}}>{(riskOnInc*100).toFixed(1)+"%"}</div></div>
+                {/* CARE */}
+                <div>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:8}}>
+                     <span style={{fontSize:13,fontWeight:700,color:T.text,fontFamily:FH}}>{tx("careTitle")}</span>
+                     <Sel T={T} v={cp} c={sCp} o={Object.keys(CARE_PLANS).map(function(k){return{v:k,l:k};})}/>
+                  </div>
+                  {careActive&&(<div><CH T={T} L={L}/>
+                    <DR T={T} l={tx("disTEMC")} si={careVals[0]} dur={cDiD} dc={sCDiD} pr={cDisPr}/>
+                    <DR T={T} l={tx("permDis")} si={careVals[1]} dur={cDiD} pr={cPDPr}/>
+                    <DR T={T} l={tx("ci40")} si={careVals[2]} pr={cCIPr}/>
+                    <DR T={T} l={tx("cancer")} si={careVals[3]} pr={cCaPr}/>
+                    <DR T={T} l={tx("insitu")} si={careVals[4]} pr={cInPr}/>
+                  </div>)}
+                </div>
+              </Sec>
+              
+              <Sec T={T} t={tx("tabCoverHeaderDoplnkSluzby")} type="must">
+                <CH T={T} L={L}/>
+                <DR T={T} l={tx("accDeath")} si={aDS} sc={sADS} dur={aDDur} dc={sADDur} pr={aDPr} b={true}/>
+                <DR T={T} l={tx("permCons")} sg={calc.sugPermDis} si={pDS} sc={sPDS} dur={pDDur} dc={sPDDur} pr={pDPr} b={true}/>
+                <DR T={T} l={tx("critIll")} sg={calc.sugCI} si={ciS} sc={sCiS} dur={ciDur} dc={sCiDur} pr={ciPr} b={true}/>
+                <div style={{marginTop:16,paddingTop:12,borderTop:"1px dashed "+T.border}}>
+                  <NR T={T} l={tx("hospital")} note={"5-300\u20ac"} si={hS} sc={sHS} pr={hPr} mx={300}/>
+                  <NR T={T} l={tx("surgical")} note={"150-5000\u20ac"} si={sS} sc={sSS} pr={sPr} mx={5000}/>
+                  <NR T={T} l={tx("fractures")} note={"500-1500\u20ac"} si={fS} sc={sFS} pr={fPr} mx={1500}/>
+                </div>
+                <div style={{padding:"12px 0",display:"flex",gap:16,flexWrap:"wrap"}}>
+                  <Chk T={T} l={tx("telemed")+" (+15\u20ac)"} ch={telOn} c={sTelOn}/>
+                  <Chk T={T} l={tx("waiver")} ch={wavOn} c={sWavOn}/>
+                </div>
+                {wavOn&&(<div style={{display:"grid",gridTemplateColumns:G5,gap:3,alignItems:"center",padding:"4px 0",borderBottom:"1px solid "+T.bl}}>
+                  <div style={{fontWeight:600,color:T.text,fontSize:11}}>{tx("waiver")}</div>
+                  <div style={{textAlign:"right",fontSize:10,color:T.dim,fontFamily:MN}}>{fmt(riskSum+ulYr,2)+" \u20ac"}</div>
+                  <div style={{textAlign:"right",fontSize:10,color:T.dim,fontFamily:MN}}>{fmt(riskSum+ulYr,2)+" \u20ac"}</div>
+                  <div style={{textAlign:"center",fontSize:9,color:T.red,fontWeight:700}}>{tx("yes")}</div>
+                  <div style={{textAlign:"right",fontSize:11,fontWeight:700,color:T.red,fontFamily:MN}}>{fmt(wvPr,2)+" \u20ac"}</div>
+                </div>)}
+              </Sec>
             </div>
-          </div>
-        </div>)}
 
-        {/* OVERVIEW */}
-        {tab==="overview"&&(<div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:8}}>
-            <div style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
-              <div style={{padding:"7px 14px",background:dark?"#2a1015":"#fdf0f2"}}><span style={{fontSize:11,fontWeight:700,color:T.red}}>{tx("incomeLoss")}</span></div>
-              <div style={{padding:"8px 14px"}}>
-                {[{k:"dis50",v:calc.d50},{k:"dis70",v:calc.d70},{k:"dis90",v:calc.d90},{k:"pension",v:calc.pen}].map(function(r,i){
-                  return <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"5px 0",borderBottom:"1px solid "+T.bl}}>
-                    <div><div style={{fontSize:10,color:T.dim}}>{tx(r.k)}</div><div style={{height:3,borderRadius:2,background:T.border,width:90,marginTop:2}}><div style={{height:"100%",borderRadius:2,background:T.red,width:Math.min((1-r.v.pct)*100,100)+"%"}}></div></div></div>
-                    <div style={{textAlign:"right"}}><div style={{fontSize:13,fontWeight:700,color:T.red,fontFamily:MN}}>{fmt(Math.round(r.v.gap))+" \u20ac"}</div><div style={{fontSize:8,color:T.dim}}>{((1-r.v.pct)*100).toFixed(0)+"%"}</div></div>
-                  </div>;})}
-              </div>
-            </div>
-            <div style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
-              <div style={{padding:"7px 14px",background:dark?T.secSub:T.lblue}}><span style={{fontSize:11,fontWeight:700,color:dark?T.text:T.blue}}>{tx("remaining")}</span></div>
-              <div style={{padding:"8px 14px"}}>
-                {[{k:"dis50",v:calc.d50.repl},{k:"dis70",v:calc.d70.repl},{k:"dis90",v:calc.d90.repl},{k:"pension",v:calc.pen.repl}].map(function(r,i){
-                  return <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderBottom:"1px solid "+T.bl}}>
-                    <span style={{fontSize:10,color:T.dim}}>{tx(r.k)}</span><span style={{fontSize:13,fontWeight:700,color:T.text,fontFamily:MN}}>{fmt(Math.round(r.v))+" \u20ac"}</span>
-                  </div>;})}
-                <div style={{marginTop:5,padding:"6px 8px",background:dark?T.bl:T.lblue,borderRadius:6,display:"flex",justifyContent:"space-between"}}>
-                  <span style={{fontSize:9,color:T.dim}}>{tx("netIncome")}</span><span style={{fontSize:14,fontWeight:800,color:T.red,fontFamily:MN}}>{fmt(ne)+" \u20ac"}</span>
+            <div className="right-col">
+              <div className="totals-card" style={{borderRadius:8,padding:"26px 22px",position:"sticky",top:20}}>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:8}}>
+                  <span style={{fontSize:12,fontWeight:700,fontFamily:FB,letterSpacing:"0.05em",textTransform:"uppercase",opacity:0.8,color:"#fff"}}>{tx("totalYearly")}</span>
+                  <span style={{fontSize:32,fontWeight:800,fontFamily:MN,letterSpacing:"-0.02em",color:"#fff",whiteSpace:"nowrap"}}>{fmt(tY,2)+"\u00A0"+tx("cur")}</span>
+                </div>
+                <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:20}}>
+                  <span style={{fontSize:12,fontWeight:600,fontFamily:FB,opacity:0.8,color:"#fff"}}>{tx("riskPart")}</span>
+                  <span style={{fontSize:18,fontWeight:700,fontFamily:MN,color:"#fff",whiteSpace:"nowrap"}}>{fmt(rP,2)+"\u00A0"+tx("cur")}</span>
+                </div>
+                
+                <div style={{borderTop:"1px solid rgba(255,255,255,0.15)",paddingTop:16,display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12}}>
+                  <div className="metric-pill">
+                    <div style={{fontSize:9,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",fontFamily:FB,marginBottom:6,opacity:0.8,color:"#fff"}}>{tx("pillRisk")}</div>
+                    <div style={{fontSize:18,fontWeight:800,fontFamily:MN,color:"#fff"}}>{tY>0?((rP/tY)*100).toFixed(0)+"%":"0%"}</div>
+                  </div>
+                  <div className="metric-pill">
+                     <div style={{fontSize:9,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",fontFamily:FB,marginBottom:6,opacity:0.8,color:"#fff"}}>{tx("pillInvest")}</div>
+                    <div style={{fontSize:18,fontWeight:800,fontFamily:MN,color:"#fff"}}>{(investOnInc*100).toFixed(1)+"%"}</div>
+                  </div>
+                  <div className="metric-pill">
+                    <div style={{fontSize:9,fontWeight:700,textTransform:"uppercase",letterSpacing:"0.06em",fontFamily:FB,marginBottom:6,opacity:0.8,color:"#fff"}}>{tx("pillExpenses")}</div>
+                    <div style={{fontSize:18,fontWeight:800,fontFamily:MN,color:"#fff"}}>{(riskOnInc*100).toFixed(1)+"%"}</div>
+                  </div>
+                </div>
+
+                <div style={{marginTop:24,padding:"14px",background:"rgba(255,255,255,0.1)",borderRadius:6}}>
+                  <div style={{fontSize:11,fontFamily:FB,opacity:0.8,marginBottom:4,color:"#fff"}}>{tx("monthlyPiAndModel")}</div>
+                  <div style={{fontSize:24,fontWeight:800,fontFamily:MN,color:"#fff"}}>{fmt(tY/12,2)+" \u20ac"}</div>
                 </div>
               </div>
             </div>
-          </div>
-          <div style={{marginTop:8,background:T.totBg,borderRadius:8,padding:"14px 16px",border:"2px solid "+T.totBdr,display:"flex",flexWrap:"wrap",gap:14,justifyContent:"space-between"}}>
-            <div><div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase"}}>{tx("neededSav")}</div><div style={{fontSize:24,fontWeight:800,color:T.red,fontFamily:MN}}>{fmt(Math.round(calc.needed))+" \u20ac"}</div></div>
-            <div style={{textAlign:"right"}}><div style={{fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase"}}>{tx("monthlyDep")}</div><div style={{fontSize:19,fontWeight:800,color:dark?T.text:T.blue,fontFamily:MN}}>{fmt(mPI,2)+" \u20ac"}</div><div style={{fontSize:9,color:T.dim}}>{iy+"% "+tx("yearly")+", "+dur+" "+tx("years")}</div></div>
-          </div>
-        </div>)}
-
-        {/* INVEST */}
-        {tab==="invest"&&(<div>
-          <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(230px,1fr))",gap:8}}>
-            <div style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
-              <div style={{padding:"7px 14px",background:dark?T.secSub:T.lblue}}><span style={{fontSize:11,fontWeight:700,color:dark?T.text:T.blue}}>{tx("investPart")}</span></div>
-              <div style={{padding:"8px 14px"}}>
-                {[{l:tx("neededSav"),v:fmt(Math.round(calc.needed))+" \u20ac",c:T.text},{l:tx("savML"),v:fmt(Math.round(calc.ulSavings))+" \u20ac",c:T.text},{l:"PI "+tx("goal")+" ("+tx("colSugg")+")",v:fmt(Math.round(calc.piTarget))+" \u20ac",c:T.red},{l:tx("monthlyDep")+" ("+tx("colSugg")+")",v:fmt(mPI,2)+" \u20ac",c:T.dim},{l:tx("monthlyDep")+" ("+tx("realSum")+")",v:fmt(piReal,2)+" \u20ac",c:T.red},{l:tx("estYield"),v:iy+" %",c:T.text},{l:tx("investDur"),v:dur+" "+tx("years"),c:T.text},{l:tx("totalDep"),v:fmt(Math.round(piReal*dur*12))+" \u20ac",c:T.dim}].map(function(r,i){
-                  return <div key={i} style={{display:"flex",justifyContent:"space-between",padding:"4px 0",borderBottom:"1px solid "+T.bl}}>
-                    <span style={{fontSize:10,color:T.dim}}>{r.l}</span><span style={{fontSize:12,fontWeight:700,color:r.c,fontFamily:MN}}>{r.v}</span>
-                  </div>;})}
-                <div style={{marginTop:6,padding:"6px 8px",background:dark?T.bl:T.yellow,borderRadius:6}}>
-                  <div style={{fontSize:9,color:T.dim}}>{tx("appreciation")}</div>
-                  <div style={{fontSize:16,fontWeight:800,color:T.red,fontFamily:MN}}>+{fmt(Math.max(0,Math.round(fvDaily(piReal,iy/100,dur)-piReal*dur*12)))+" \u20ac"}</div>
-                </div>
-              </div>
-            </div>
-            <div style={{background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
-              <div style={{padding:"7px 14px",background:dark?T.secSub:T.lgreen}}><span style={{fontSize:11,fontWeight:700,color:dark?T.text:T.blue}}>{tx("futureVal")}</span></div>
-              <div style={{padding:"8px 14px"}}>
-                {[4,6,7,8,10].map(function(r){var val=fvDaily(piReal,r/100,dur);var a=r===iy;
-                  return <div key={r} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"4px 0",borderBottom:"1px solid "+T.bl}}>
-                    <span style={{fontSize:10,color:a?T.red:T.dim,fontWeight:a?700:500}}>{r+"% "+tx("yearly")}</span>
-                    <span style={{fontSize:12,fontWeight:a?800:600,color:a?T.red:T.text,fontFamily:MN}}>{fmt(Math.round(val))+" \u20ac"}</span>
-                  </div>;})}
-              </div>
-            </div>
-          </div>
-          <div style={{marginTop:8,background:T.card,borderRadius:8,border:"1px solid "+T.border,overflow:"hidden"}}>
-            <div style={{padding:"7px 14px",background:T.secSub,borderBottom:"1px solid "+T.border}}><span style={{fontSize:11,fontWeight:700,color:T.text}}>{tx("yearlyOverview")}</span></div>
-            <div style={{padding:"8px 14px",overflowX:"auto"}}>
-              <table style={{width:"100%",borderCollapse:"collapse",fontSize:11}}>
-                <thead><tr style={{borderBottom:"2px solid "+T.red}}>
-                  {[tx("year"),tx("depTotal"),tx("futureVal")+" "+iy+"%",tx("profit")].map(function(h,i){return <th key={i} style={{padding:"4px 6px",textAlign:"right",fontSize:8,fontWeight:700,color:T.dim,textTransform:"uppercase"}}>{h}</th>;})}
-                </tr></thead>
-                <tbody>{[1,2,3,5,7,10,15,20,25,30].filter(function(y){return y<=dur;}).map(function(yr){
-                  var dep=piReal*yr*12;var val=fvDaily(piReal,iy/100,yr);var p=val-dep;
-                  return <tr key={yr} style={{borderBottom:"1px solid "+T.bl}}>
-                    <td style={{padding:"3px 6px",textAlign:"right",fontWeight:700,color:T.text}}>{yr}</td>
-                    <td style={{padding:"3px 6px",textAlign:"right",fontFamily:"monospace",color:T.dim}}>{fmt(Math.round(dep))+" \u20ac"}</td>
-                    <td style={{padding:"3px 6px",textAlign:"right",fontFamily:"monospace",fontWeight:700,color:T.red}}>{fmt(Math.round(val))+" \u20ac"}</td>
-                    <td style={{padding:"3px 6px",textAlign:"right",fontFamily:"monospace",color:p>=0?T.red:T.text}}>{(p>=0?"+":"")+fmt(Math.round(p))+" \u20ac"}</td>
-                  </tr>;})}</tbody>
-              </table>
-            </div>
-          </div>
-        </div>)}
-
-        <div style={{marginTop:16,textAlign:"center",fontSize:8,color:T.dim}}>{"\u00a9 PARTNERS GROUP SK \u2022 "+tx("title")+" \u2022 BG 3/2026"}</div>
+          </>)}
+          
+        </div>
+        <div style={{marginTop:40,textAlign:"center",fontSize:10,color:T.dim,fontFamily:FB}}>{"\u00a9 PARTNERS GROUP SK \u2022 "+tx("title")+" \u2022 BG 3/2026"}</div>
       </div>
     </div>
   );
