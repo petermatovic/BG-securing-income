@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 
 /* Rate tables */
 var DIS_R={18:2.82,19:2.94,20:2.94,21:3.06,22:3.06,23:3.18,24:3.18,25:3.3,26:3.3,27:3.43,28:3.55,29:3.67,30:3.79,31:3.92,32:4.04,33:4.16,34:4.41,35:4.53,36:4.77,37:5.02,38:5.26,39:5.51,40:5.75,41:6,42:6.24,43:6.61,44:6.98,45:7.34,46:7.71,47:8.2,48:8.57,49:9.18,50:9.67,51:10.28,52:10.89,53:11.51,54:12.12,55:12.85,56:13.71,57:14.57,58:15.67,59:16.65,60:18.12,61:18.6,62:19.34,63:20.2,64:21.42,65:23.75};
@@ -126,7 +126,7 @@ function calcAll(br,ne,age,dur,iy,py,pyr,st,loan,ulOn,ulMonthly,cgOn,cgDD,cgInsu
   if(cgDD){sugPermDis=ne*10;}
   else{sugPermDis=safe(pvFd*gap70*1.5+loan-carePD-careDis);if(sugPermDis<0)sugPermDis=0;}
 
-  var sugCI=safe(ne*18+10000-careCI);
+  var sugCI=careCI>0?0:sugPermDis;
   if(sugCI<0)sugCI=0;
 
   return{
@@ -185,7 +185,7 @@ var I={
   fractures:{sk:"Zlomeniny a pop\u00e1leniny",en:"Fractures and burns",bg:"\u0421\u0447\u0443\u043f\u0432\u0430\u043d\u0438\u044f \u0438 \u0438\u0437\u0433\u0430\u0440\u044f\u043d\u0438\u044f"},
   telemed:{sk:"Telemedic\u00edna",en:"Telemedicine",bg:"\u0422\u0435\u043b\u0435\u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0430"},
   waiver:{sk:"Waiver",en:"Waiver",bg:"Waiver"},
-  cur:{sk:"\u20ac",en:"\u20ac",bg:"\u20ac"},
+  cur:{sk:"\u20ac",en:"\u20ac",bg:"\u043b\u0432."},
   totalYearly:{sk:"Celkov\u00e9 ro\u010dn\u00e9 poistn\u00e9",en:"Total yearly premium",bg:"\u041e\u0431\u0449\u0430 \u0433\u043e\u0434\u0438\u0448\u043d\u0430 \u043f\u0440\u0435\u043c\u0438\u044f"},
   riskPart:{sk:"Rizikov\u00e1 \u010das\u0165",en:"Risk part",bg:"\u0420\u0438\u0441\u043a\u043e\u0432\u0430 \u0447\u0430\u0441\u0442"},
   investInc:{sk:"Investi\u010dn\u00e1 \u010das\u0165 z pr\u00edjmu",en:"Investment part of income",bg:"\u0418\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u043e\u043d\u043d\u0430 \u0447\u0430\u0441\u0442 \u043e\u0442 \u0434\u043e\u0445\u043e\u0434\u0430"},riskInc:{sk:"Rizikov\u00e1 \u010das\u0165 z pr\u00edjmu",en:"Risk part of income",bg:"\u0420\u0438\u0441\u043a\u043e\u0432\u0430 \u0447\u0430\u0441\u0442 \u043e\u0442 \u0434\u043e\u0445\u043e\u0434\u0430"},
@@ -236,9 +236,23 @@ var I={
   rdYield: {sk: "O\u010dak\u00e1van\u00e9 zhodnotenie po\u010das renty", en: "Expected appreciation during payout", bg: "\u041e\u0447\u0430\u043a\u0432\u0430\u043d\u0430 \u0434\u043e\u0445\u043e\u0434\u043d\u043e\u0441\u0442"},
   rdMattress: {sk: "Potrebn\u00fd kapit\u00e1l, keby sa ne\u00faro\u010dil", en: "Required capital without interest", bg: "\u041d\u0435\u043e\u0431\u0445\u043e\u0434\u0438\u043c \u043a\u0430\u043f\u0438\u0442\u0430\u043b \u0431\u0435\u0437 \u043b\u0438\u0445\u0432\u0430"},
   rdSaved: {sk: "V\u00e1\u0161 bonus v\u010faka \u00faro\u010deniu", en: "Your bonus thanks to investing", bg: "\u0412\u0430\u0448\u0438\u044f\u0442 \u0431\u043e\u043d\u0443\u0441 \u0431\u043b\u0430\u0433\u043e\u0434\u0430\u0440\u0435\u043d\u0438\u0435 \u043d\u0430 \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0440\u0430\u043d\u0435"},
-  rdExpl: {sk: "Suma, ktor\u00fa skuto\u010dne potrebujete nakumulova\u0165, je podstatne ni\u017e\u0161ia, preto\u017ee va\u0161a renta sa bude zhodnocova\u0165 aj po\u010das jej vypl\u00e1cania.", en: "The amount you actually need to accumulate is significantly lower because your pension will continue to appreciate even during its payout.", bg: "\u0421\u0443\u043c\u0430\u0442\u0430, \u043a\u043e\u044f\u0442\u043e \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0442\u0435\u043b\u043d\u043e \u0442\u0440\u044f\u0431\u0432\u0430 \u0434\u0430 \u043d\u0430\u0442\u0440\u0443\u043f\u0430\u0442\u0435, \u0435 \u0437\u043d\u0430\u0447\u0438\u0442\u0435\u043b\u043d\u043e \u043f\u043e-\u043d\u0438\u0441\u043a\u0430, \u0442\u044a\u0439 \u043a\u0430\u0442\u043e \u043f\u0435\u043d\u0441\u0438\u044f\u0442\u0430 \u0432\u0438 \u0449\u0435 \u043f\u0440\u043e\u0434\u044a\u043b\u0436\u0438 \u0434\u0430 \u0441\u0435 \u043e\u043b\u0438\u0445\u0432\u044f\u0432\u0430."}
+  rdExpl: {sk: "Suma, ktor\u00fa skuto\u010dne potrebujete nakumulova\u0165, je podstatne ni\u017e\u0161ia, preto\u017ee va\u0161a renta sa bude zhodnocova\u0165 aj po\u010das jej vypl\u00e1cania.", en: "The amount you actually need to accumulate is significantly lower because your pension will continue to appreciate even during its payout.", bg: "\u0421\u0443\u043c\u0430\u0442\u0430, \u043a\u043e\u044f\u0442\u043e \u0434\u0435\u0439\u0441\u0442\u0432\u0438\u0442\u0435\u043b\u043d\u043e \u0442\u0440\u044f\u0431\u0432\u0430 \u0434\u0430 \u043d\u0430\u0442\u0440\u0443\u043f\u0430\u0442\u0435, \u0435 \u0437\u043d\u0430\u0447\u0438\u0442\u0435\u043b\u043d\u043e \u043f\u043e-\u043d\u0438\u0441\u043a\u0430, \u0442\u044a\u0439 \u043a\u0430\u0442\u043e \u043f\u0435\u043d\u0441\u0438\u044f\u0442\u0430 \u0432\u0438 \u0449\u0435 \u043f\u0440\u043e\u0434\u044a\u043b\u0436\u0438 \u0434\u0430 \u0441\u0435 \u043e\u043b\u0438\u0445\u0432\u044f\u0432\u0430."},
+  pensionWithPlan: {sk:"D\u00f4chodok s va\u0161\u00edm pl\u00e1nom", en:"Pension with your plan", bg:"\u041f\u0435\u043d\u0441\u0438\u044f \u0441 \u0432\u0430\u0448\u0438\u044f \u043f\u043b\u0430\u043d"},
+  stateOnly: {sk:"\u0160t\u00e1tna penzia", en:"State pension", bg:"\u0414\u044a\u0440\u0436\u0430\u0432\u043d\u0430 \u043f\u0435\u043d\u0441\u0438\u044f"},
+  fromInvestment: {sk:"renta z invest\u00edcie", en:"rent from investment", bg:"\u0440\u0435\u043d\u0442\u0430 \u043e\u0442 \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u044f\u0442\u0430"},
+  ofWhichPI: {sk:"z toho PI", en:"of which PI", bg:"\u043e\u0442 \u043a\u043e\u0438\u0442\u043e PI"},
+  ofWhichUL: {sk:"z toho UL", en:"of which UL", bg:"\u043e\u0442 \u043a\u043e\u0438\u0442\u043e UL"},
+  clientName: {sk:"Meno klienta", en:"Client name", bg:"\u0418\u043c\u0435 \u043d\u0430 \u043a\u043b\u0438\u0435\u043d\u0442\u0430"},
+  advisorName: {sk:"Poradca", en:"Advisor", bg:"\u041a\u043e\u043d\u0441\u0443\u043b\u0442\u0430\u043d\u0442"},
+  clientSection: {sk:"Klientsk\u00e9 \u00fadaje", en:"Client data", bg:"\u041a\u043b\u0438\u0435\u043d\u0442\u0441\u043a\u0438 \u0434\u0430\u043d\u043d\u0438"},
+  exportPDF: {sk:"Export PDF", en:"Export PDF", bg:"\u0415\u043a\u0441\u043f\u043e\u0440\u0442 PDF"},
+  date: {sk:"D\u00e1tum", en:"Date", bg:"\u0414\u0430\u0442\u0430"},
+  export: {sk:"Export JSON", en:"Export JSON", bg:"\u0415\u043a\u0441\u043f\u043e\u0440\u0442 JSON"},
+  import: {sk:"Import JSON", en:"Import JSON", bg:"\u0412\u043d\u043e\u0441 JSON"}
 };
-function t(k,l){return(I[k]&&I[k][l])||I[k].sk||k;}
+var GLang = "bg";
+function t(k,l){return(I[k]&&I[k][l||GLang])||I[k].sk||k;}
+function tx(k){return t(k, GLang);}
 
 /* ══════════════════════════════════════════════════════════════
    STERLING HERITAGE – Light Mode Tokens (matches Stitch output)
@@ -344,10 +358,10 @@ function CH(p){var T=p.T;return(
 function DR(p){var T=p.T;var w=mW(T),s={...mI(T),fontSize:11};return(
   <div className="grid-row" style={{display:"grid",gridTemplateColumns:G5,gap:4,alignItems:"center",padding:"5px 0",borderBottom:"1px solid "+T.bl}}>
     <div style={{fontWeight:p.b?700:500,color:p.b?T.text:T.dim,fontSize:p.b?12:11,fontFamily:FB}}>{p.l}</div>
-    <div style={{textAlign:"right",fontSize:11,color:T.dim,fontFamily:MN}}>{p.sg!=null?fmt(p.sg)+" \u20ac":""}</div>
-    {p.sc?(<div style={w}><input type="number" value={p.si||0} onChange={function(e){p.sc(Number(e.target.value));}} style={s}/><span style={{fontSize:9,color:T.dim}}>{"\u20ac"}</span></div>):(<div style={{textAlign:"right",fontSize:11,color:T.dim,fontFamily:MN}}>{p.si!=null?fmt(p.si)+" \u20ac":""}</div>)}
+    <div style={{textAlign:"right",fontSize:11,color:T.dim,fontFamily:MN}}>{p.sg!=null?fmt(p.sg)+" "+tx("cur"):""}</div>
+    {p.sc?(<div style={w}><input type="number" value={p.si||0} onChange={function(e){p.sc(Number(e.target.value));}} style={s}/><span style={{fontSize:9,color:T.dim}}>{tx("cur")}</span></div>):(<div style={{textAlign:"right",fontSize:11,color:T.dim,fontFamily:MN}}>{p.si!=null?fmt(p.si)+" "+tx("cur"):""}</div>)}
     {p.dc?(<div style={w}><input type="number" value={p.dur||0} onChange={function(e){p.dc(Number(e.target.value));}} min={1} max={80} style={s}/></div>):(<div style={{textAlign:"right",fontSize:11,color:T.dim,fontFamily:MN}}>{p.dur||""}</div>)}
-    <div style={{textAlign:"right",fontSize:12,fontWeight:p.b?700:600,color:p.pr>0.005?T.red:T.dim,fontFamily:MN}}>{p.pr!=null?fmt(p.pr,2)+" \u20ac":""}</div>
+    <div style={{textAlign:"right",fontSize:12,fontWeight:p.b?700:600,color:p.pr>0.005?T.red:T.dim,fontFamily:MN}}>{p.pr!=null?fmt(p.pr,2)+" "+tx("cur"):""}</div>
   </div>
 );}
 
@@ -356,9 +370,9 @@ function NR(p){var T=p.T;var w=mW(T),s={...mI(T),fontSize:11};return(
   <div className="grid-row" style={{display:"grid",gridTemplateColumns:G5,gap:4,alignItems:"center",padding:"5px 0",borderBottom:"1px solid "+T.bl}}>
     <div style={{fontSize:11,color:T.dim,fontFamily:FB}}>{p.l}{p.note?" ("+p.note+")":""}</div>
     <div></div>
-    <div style={w}><input type="number" value={p.si} onChange={function(e){p.sc(Number(e.target.value));}} min={0} max={p.mx||9999} style={s}/><span style={{fontSize:9,color:T.dim}}>{"\u20ac"}</span></div>
+    <div style={w}><input type="number" value={p.si} onChange={function(e){p.sc(Number(e.target.value));}} min={0} max={p.mx||9999} style={s}/><span style={{fontSize:9,color:T.dim}}>{tx("cur")}</span></div>
     <div></div>
-    <div style={{textAlign:"right",fontSize:12,fontWeight:600,color:p.pr>0.005?T.red:T.dim,fontFamily:MN}}>{fmt(p.pr,2)+" \u20ac"}</div>
+    <div style={{textAlign:"right",fontSize:12,fontWeight:600,color:p.pr>0.005?T.red:T.dim,fontFamily:MN}}>{fmt(p.pr,2)+" "+tx("cur")}</div>
   </div>
 );}
 
@@ -368,7 +382,8 @@ export default function App(){
   var _=useState;
   var _d=_(false),dark=_d[0],setDark=_d[1];
   var _l=_("bg"),lang=_l[0],setLang=_l[1];
-  var T=dark?DK:LT;var L=lang;function tx(k){return t(k,L);}
+  GLang = lang;
+  var T=dark?DK:LT;var L=lang;
 
   var _br=_(2550),br=_br[0],sBr=_br[1];var _ne=_(2000),ne=_ne[0],sNe=_ne[1];
   var _age=_(25),age=_age[0],sAge=_age[1];var _iy=_(8),iy=_iy[0],sIy=_iy[1];
@@ -390,9 +405,62 @@ export default function App(){
   var _ciS=_(0),ciS=_ciS[0],sCiS=_ciS[1];var _ciDur=_(5),ciDur=_ciDur[0],sCiDur=_ciDur[1];
 
   var _hS=_(0),hS=_hS[0],sHS=_hS[1];var _sS=_(0),sS=_sS[0],sSS=_sS[1];var _fS=_(0),fS=_fS[0],sFS=_fS[1];
-  var _telOn=_(true),telOn=_telOn[0],sTelOn=_telOn[1];var _wavOn=_(true),wavOn=_wavOn[0],sWavOn=_wavOn[1];
+  var _telOn=_(true),telOn=_telOn[0],sTelOn=_telOn[1];var _wavOn=_(false),wavOn=_wavOn[0],sWavOn=_wavOn[1];
   var _piReal=_(93),piReal=_piReal[0],sPiReal=_piReal[1];
   var _tab=_("model"),tab=_tab[0],sTab=_tab[1];
+  var _pm=_(false),printMode=_pm[0],setPrintMode=_pm[1];
+  var _cn=_(""),clientName=_cn[0],setClientName=_cn[1];
+  var _an=_(""),advisorName=_an[0],setAdvisorName=_an[1];
+
+  function handlePrint(){
+    setPrintMode(true);
+    setTimeout(function(){
+      window.print();
+      setTimeout(function(){setPrintMode(false);},1000);
+    },200);
+  }
+
+  function handleExport(){
+    var state = {br:br,ne:ne,age:age,iy:iy,py:py,pyr:pyr,st:st,rk:rk,loan:loan,dur:dur,cg:cg,cgDD:cgDD,cgS:cgS,cgD:cgD,ul:ul,ulM:ulM,ulDS:ulDS,ulDur:ulDur,cp:cp,cDiD:cDiD,aDS:aDS,aDDur:aDDur,pDS:pDS,pDDur:pDDur,ciS:ciS,ciDur:ciDur,hS:hS,sS:sS,fS:fS,telOn:telOn,wavOn:wavOn,piReal:piReal,clientName:clientName,advisorName:advisorName};
+    var dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(state));
+    var anchor = document.createElement('a');
+    anchor.setAttribute("href", dataStr);
+    anchor.setAttribute("download", (clientName||"klient") + "_BG_Income.json");
+    document.body.appendChild(anchor);
+    anchor.click();
+    anchor.remove();
+  }
+
+  function handleImport(e){
+    var file = e.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(evt){
+      try{
+        var st = JSON.parse(evt.target.result);
+        if(st.br!==undefined) sBr(st.br); if(st.ne!==undefined) sNe(st.ne);
+        if(st.age!==undefined) sAge(st.age); if(st.iy!==undefined) sIy(st.iy);
+        if(st.py!==undefined) sPy(st.py); if(st.pyr!==undefined) sPyr(st.pyr);
+        if(st.st!==undefined) sSt(st.st); if(st.rk!==undefined) sRk(st.rk);
+        if(st.loan!==undefined) sLoan(st.loan); if(st.dur!==undefined) sDur(st.dur);
+        if(st.cg!==undefined) sCg(st.cg); if(st.cgDD!==undefined) sCgDD(st.cgDD);
+        if(st.cgS!==undefined) sCgS(st.cgS); if(st.cgD!==undefined) sCgD(st.cgD);
+        if(st.ul!==undefined) sUl(st.ul); if(st.ulM!==undefined) sUlM(st.ulM);
+        if(st.ulDS!==undefined) sUlDS(st.ulDS); if(st.ulDur!==undefined) sUlDur(st.ulDur);
+        if(st.cp!==undefined) sCp(st.cp); if(st.cDiD!==undefined) sCDiD(st.cDiD);
+        if(st.aDS!==undefined) sADS(st.aDS); if(st.aDDur!==undefined) sADDur(st.aDDur);
+        if(st.pDS!==undefined) sPDS(st.pDS); if(st.pDDur!==undefined) sPDDur(st.pDDur);
+        if(st.ciS!==undefined) sCiS(st.ciS); if(st.ciDur!==undefined) sCiDur(st.ciDur);
+        if(st.hS!==undefined) sHS(st.hS); if(st.sS!==undefined) sSS(st.sS);
+        if(st.fS!==undefined) sFS(st.fS); if(st.telOn!==undefined) sTelOn(st.telOn);
+        if(st.wavOn!==undefined) sWavOn(st.wavOn); if(st.piReal!==undefined) sPiReal(st.piReal);
+        if(st.clientName!==undefined) setClientName(st.clientName);
+        if(st.advisorName!==undefined) setAdvisorName(st.advisorName);
+      }catch(err){alert("Chybný súbor / Invalid file");}
+    };
+    reader.readAsText(file);
+    e.target.value = null;
+  }
 
   var _embO=_(""),embO=_embO[0],sEmbO=_embO[1];
   var _showRD=_(false),showRD=_showRD[0],sShowRD=_showRD[1];
@@ -402,6 +470,11 @@ export default function App(){
   var mPI=calc.monthlyPI;
   var careVals=CARE_PLANS[cp]||CARE_PLANS["not included"];
   var careActive=cp!=="not included";
+
+  useEffect(function(){
+    var c=CARE_PLANS[cp]||CARE_PLANS["not included"];
+    if(c[2]===0) sCiS(calc.sugCI);
+  }, [cp, cgDD, calc.sugCI]);
 
   /* Premiums */
   var cgRate=lr(cgDD?DD:DOT,age,cgD);var cgPr=cg?(cgS/100000)*cgRate*12:0;
@@ -423,10 +496,16 @@ export default function App(){
 
   var aDPr=aDS*rc.acc/1000;var pDPr=pDS*rc.pi/1000;
   var kR=ciDur<=5?kchRate(KCH5,age):kchRate(KCH10,age);
-  var ciPr=ul?(ciS/1000*ciRR):(ciS/10000*kR);
+  var ciPr=ul?(ciS/1000*ciRR):(ciS/1000*kR);
 
   var hPr=hS*4.25;var sPr=sS*8.32/100;var fPr=fS*rc.frac/1000;
   var telPr=telOn?15:0;
+
+  /* Renta z plánu (PI + UL) pri dôchodku */
+  var piRealFV = fvDaily(piReal, iy/100, dur);
+  var totalCapitalAtRetirement = piRealFV + (calc.ulSavings || 0);
+  var monthlyRentFromPlan = calc.pvF > 0 ? totalCapitalAtRetirement / calc.pvF : 0;
+  var pensionWithPlan = (calc.pen.repl || 0) + monthlyRentFromPlan;
 
   var riskSum=cgPr+ulDeathPr+cDisPr+cPDPr+cCIPr+cCaPr+cInPr+cTelPr+aDPr+pDPr+ciPr+hPr+sPr+fPr+telPr;
   var wvPr=wavOn?safe(riskSum*WRT[rk]):0;
@@ -471,18 +550,40 @@ export default function App(){
             {/* TABS removed from here */}
           </div>
 
-          <div style={{display:"flex",alignItems:"center",gap:6}}>
+          <div className="no-print" style={{display:"flex",alignItems:"center",gap:6}}>
             {["bg","sk","en"].map(function(lg){return <button key={lg} className="lang-btn" onClick={function(){setLang(lg);}} style={btnS(lang===lg)}>{lg.toUpperCase()}</button>;})}
             <div style={{width:1,height:18,background:T.border,margin:"0 4px"}}></div>
             <button className="lang-btn" onClick={function(){setDark(!dark);}} style={btnS(false)}>{dark?tx("light"):tx("dark")}</button>
+            <div style={{width:1,height:18,background:T.border,margin:"0 4px"}}></div>
+            <label style={{...btnS(false),cursor:"pointer",display:"flex",alignItems:"center"}}>
+              &#10515; {tx("import")}
+              <input type="file" accept=".json" onChange={handleImport} style={{display:"none"}}/>
+            </label>
+            <button className="lang-btn" onClick={handleExport} style={btnS(false)}>&#10514; {tx("export")}</button>
+            <button className="lang-btn" onClick={handlePrint} style={{...btnS(false),background:"#AB0534",color:"#fff",borderColor:"#AB0534"}}>{"\u2913 "+tx("exportPDF")}</button>
           </div>
         </div>
       </div>
 
       <div className="app-container">
         
+        {/* PRINT-ONLY HEADER - viditeľný iba pri tlači */}
+        <div className="print-only print-header">
+          <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",borderBottom:"2px solid #AB0534",paddingBottom:12,marginBottom:20}}>
+            <div>
+              <div style={{fontSize:22,fontWeight:900,color:"#AB0534",letterSpacing:"0.06em"}}>PARTNERS</div>
+              <div style={{fontSize:11,color:"#4D4D4D",marginTop:2}}>{tx("title")} \u2022 BG 3/2026</div>
+            </div>
+            <div style={{textAlign:"right",fontSize:11,color:"#4D4D4D"}}>
+              <div><strong>{tx("clientName")}:</strong> {clientName||"\u2014"}</div>
+              <div><strong>{tx("advisorName")}:</strong> {advisorName||"\u2014"}</div>
+              <div><strong>{tx("date")}:</strong> {new Date().toLocaleDateString("sk-SK")}</div>
+            </div>
+          </div>
+        </div>
+
         {/* TABS NAD STREDNOU TABULKOU */}
-        <div className="main-grid" style={{marginBottom: 20, alignItems: "center"}}>
+        <div className="main-grid no-print" style={{marginBottom: 20, alignItems: "center"}}>
           <div>
             {/* Title can stay in the left col or be hidden, let's keep it here aligned cleanly */}
             <h1 style={{fontSize:22,fontWeight:800,fontFamily:FH,color:T.text}}>
@@ -513,6 +614,24 @@ export default function App(){
           
           {/* LFT COLUMN: VSTUPNÉ ÚDAJE (Fixný pre vš. taby) */}
           <aside>
+            <div style={{background:T.card,borderRadius:8,padding:"14px 18px",boxShadow:"0 2px 10px rgba(0,0,0,0.02)",border:"1px solid "+T.border,marginBottom:14}}>
+              <div style={{...mL(T),color:T.red,marginBottom:10,fontSize:11}}>{tx("clientSection")}</div>
+              <div style={{display:"flex",flexDirection:"column",gap:10}}>
+                <div style={{display:"flex",flexDirection:"column",gap:3}}>
+                  <label style={mL(T)}>{tx("clientName")}</label>
+                  <div style={mW(T)}>
+                    <input type="text" value={clientName} onChange={function(e){setClientName(e.target.value);}} style={{...mI(T),textAlign:"left"}}/>
+                  </div>
+                </div>
+                <div style={{display:"flex",flexDirection:"column",gap:3}}>
+                  <label style={mL(T)}>{tx("advisorName")}</label>
+                  <div style={mW(T)}>
+                    <input type="text" value={advisorName} onChange={function(e){setAdvisorName(e.target.value);}} style={{...mI(T),textAlign:"left"}}/>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div style={{background:T.card,borderRadius:8,padding:"16px 18px",boxShadow:"0 2px 10px rgba(0,0,0,0.02)",border:"1px solid "+T.border}}>
               <div style={{...mL(T),color:T.red,marginBottom:14,fontSize:11}}>{tx("inputs")}</div>
               
@@ -546,7 +665,8 @@ export default function App(){
           </aside>
 
           {/* ─ OVERVIEW ───────────────────────────────────────────── */}
-          {tab==="overview"&&(<>
+          {(tab==="overview"||printMode)&&(<>
+            {printMode&&<div className="print-tab-title" style={{gridColumn:"1 / -1"}}><h2 style={{fontSize:16,fontWeight:800,color:"#AB0534",margin:"20px 0 10px",pageBreakBefore:"always"}}>{tx("tabIncomeSecHeader")}</h2></div>}
             <div className="center-col">
               <Sec T={T} t={tx("overviewLossComp")} type="must">
                 <div style={{padding:"6px 0"}}>
@@ -590,7 +710,7 @@ export default function App(){
                     
                     <div style={{display:"flex",justifyContent:"space-between",paddingBottom:8,borderBottom:"1px solid "+T.border}}>
                       <span style={{fontSize:11,color:T.dim,fontFamily:FB,paddingRight:20}}>{tx("rdGap")}</span>
-                      <span style={{fontSize:13,fontWeight:700,fontFamily:MN,color:T.text,whiteSpace:"nowrap"}}>{fmt(Math.max(0,calc.pen.gap))} &euro; / {tx("month")}</span>
+                      <span style={{fontSize:13,fontWeight:700,fontFamily:MN,color:T.text,whiteSpace:"nowrap"}}>{fmt(Math.max(0,calc.pen.gap))} {tx("cur")} / {tx("month")}</span>
                     </div>
                     
                     <div style={{display:"flex",justifyContent:"space-between",padding:"8px 0",borderBottom:"1px solid "+T.border}}>
@@ -609,11 +729,11 @@ export default function App(){
                       </div>
                       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}}>
                         <span style={{fontSize:11,color:T.dim,fontFamily:FB}}>{tx("rdMattress")}</span>
-                        <span style={{fontSize:13,textDecoration:"line-through",opacity:0.6,fontFamily:MN}}>{fmt(Math.max(0,calc.pen.gap)*pyr*12)} &euro;</span>
+                        <span style={{fontSize:13,textDecoration:"line-through",opacity:0.6,fontFamily:MN}}>{fmt(Math.max(0,calc.pen.gap)*pyr*12)} {tx("cur")}</span>
                       </div>
                       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center"}}>
                         <span style={{fontSize:11,fontWeight:700,color:"#22863a",fontFamily:FB}}>{tx("rdSaved")}</span>
-                        <span style={{fontSize:15,fontWeight:800,color:"#22863a",fontFamily:MN}}>+{fmt(Math.max(0,(Math.max(0,calc.pen.gap)*pyr*12)-calc.needed))} &euro;</span>
+                        <span style={{fontSize:15,fontWeight:800,color:"#22863a",fontFamily:MN}}>+{fmt(Math.max(0,(Math.max(0,calc.pen.gap)*pyr*12)-calc.needed))} {tx("cur")}</span>
                       </div>
                     </div>
                   </div>
@@ -629,27 +749,41 @@ export default function App(){
                 
                 <div style={{background:"rgba(255,255,255,0.1)",borderRadius:6,padding:"12px 14px",marginBottom:20}}>
                    <div style={{fontSize:10,fontFamily:FB,opacity:0.8,marginBottom:4}}>{tx("netIncome")}</div>
-                   <div style={{fontSize:24,fontWeight:800,fontFamily:MN}}>{fmt(ne)+" \u20ac"}</div>
+                   <div style={{fontSize:24,fontWeight:800,fontFamily:MN}}>{fmt(ne)+" "+tx("cur")}</div>
                 </div>
 
                 <div style={{display:"flex",flexDirection:"column",gap:16}}>
                   {[{k:"dis50",v:calc.d50.repl},{k:"dis70",v:calc.d70.repl},{k:"dis90",v:calc.d90.repl},{k:"pension",v:calc.pen.repl}].map(function(r,i){
                     return <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",borderBottom:i<3?"1px solid rgba(255,255,255,0.15)":"none",paddingBottom:i<3?12:0}}>
                       <span style={{fontSize:12,fontFamily:FB,opacity:0.9,color:"#fff"}}>{tx(r.k)}</span>
-                      <span style={{fontSize:15,fontWeight:700,fontFamily:MN,color:"#fff"}}>{fmt(Math.round(r.v))+" \u20ac"}</span>
+                      <span style={{fontSize:15,fontWeight:700,fontFamily:MN,color:"#fff"}}>{fmt(Math.round(r.v))+" "+tx("cur")}</span>
                     </div>;
                   })}
+                </div>
+
+                {/* Dôchodok s plánom — highlight blok */}
+                <div style={{marginTop:24,padding:"16px 14px",background:"rgba(255,255,255,0.20)",borderRadius:6,border:"1px solid rgba(255,255,255,0.30)"}}>
+                  <div style={{fontSize:10,fontFamily:FB,opacity:0.9,marginBottom:8,color:"#fff",fontWeight:700,letterSpacing:"0.04em",textTransform:"uppercase"}}>
+                    {tx("pensionWithPlan")}
+                  </div>
+                  <div style={{display:"flex",justifyContent:"space-between",alignItems:"baseline",marginBottom:6,fontSize:11,fontFamily:FB,opacity:0.85,color:"#fff"}}>
+                    <span>{tx("stateOnly")}: {fmt(Math.round(calc.pen.repl))} {tx("cur")}</span>
+                    <span>+{fmt(Math.round(monthlyRentFromPlan))} {tx("cur")} ({tx("fromInvestment")})</span>
+                  </div>
+                  <div style={{fontSize:26,fontWeight:800,fontFamily:MN,color:"#fff",textAlign:"right",marginTop:4}}>
+                    = {fmt(Math.round(pensionWithPlan))} {tx("cur")}
+                  </div>
                 </div>
               </div>
             </div>
           </>)}
 
           {/* ─ INVEST ─────────────────────────────────────────────── */}
-          {tab==="invest"&&(<div style={{gridColumn:"span 2",display:"grid",gridTemplateColumns:"1fr 1fr",gap:24,alignItems:"start"}}>
+          {(tab==="invest"||printMode)&&(<><div className="print-tab-title" style={{gridColumn:"1 / -1",display:printMode?"block":"none"}}><h2 style={{fontSize:16,fontWeight:800,color:"#AB0534",margin:"20px 0 10px",pageBreakBefore:"always"}}>{tx("tabInvestCapHeader")}</h2></div><div style={{gridColumn:"span 2",display:"grid",gridTemplateColumns:"1fr 1fr",gap:24,alignItems:"start"}}>
               <div>
                 <Sec T={T} t={tx("investAnalTitle")} type="must">
                   <div style={{padding:"8px 0"}}>
-                    {[{l:tx("neededSav"),v:fmt(Math.round(calc.needed))+" \u20ac",c:T.text},{l:tx("savML"),v:fmt(Math.round(calc.ulSavings))+" \u20ac",c:T.text},{l:tx("investCiel")+" ("+tx("colSugg")+")",v:fmt(Math.round(calc.piTarget))+" \u20ac",c:T.red},{l:tx("monthlyDep")+" ("+tx("colSugg")+")",v:fmt(mPI,2)+" \u20ac",c:T.dim},{l:tx("monthlyDep")+" ("+tx("realSum")+")",v:fmt(piReal,2)+" \u20ac",c:T.red},{l:tx("estYield"),v:iy+" %",c:T.text},{l:tx("investDur"),v:dur+" "+tx("years"),c:T.text},{l:tx("totalDep"),v:fmt(Math.round(piReal*dur*12))+" \u20ac",c:T.dim}].map(function(r,i){
+                    {[{l:tx("neededSav"),v:fmt(Math.round(calc.needed))+" "+tx("cur"),c:T.text},{l:tx("savML"),v:fmt(Math.round(calc.ulSavings))+" "+tx("cur"),c:T.text},{l:tx("investCiel")+" ("+tx("colSugg")+")",v:fmt(Math.round(calc.piTarget))+" "+tx("cur"),c:T.red},{l:tx("monthlyDep")+" ("+tx("colSugg")+")",v:fmt(mPI,2)+" "+tx("cur"),c:T.dim},{l:tx("monthlyDep")+" ("+tx("realSum")+")",v:fmt(piReal,2)+" "+tx("cur"),c:T.red},{l:tx("estYield"),v:iy+" %",c:T.text},{l:tx("investDur"),v:dur+" "+tx("years"),c:T.text},{l:tx("totalDep"),v:fmt(Math.round(piReal*dur*12+(ul?Math.max(ulM*12,300)*dur:0)))+" "+tx("cur"),c:T.dim}].map(function(r,i){
                       return <div key={i} style={{display:"flex",justifyContent:"space-between",alignItems:"center",padding:"8px 0",borderBottom:"1px solid "+T.bl}}>
                         <span style={{fontSize:12,color:T.dim,fontFamily:FB}}>{r.l}</span>
                         <span style={{fontSize:14,fontWeight:700,color:r.c,fontFamily:MN}}>{r.v}</span>
@@ -674,9 +808,9 @@ export default function App(){
                       </div>
                       <div style={{display:"grid",gridTemplateColumns:"1fr 80px 80px 80px",gap:6,alignItems:"center",padding:"8px 0"}}>
                         <div style={{fontSize:12,fontWeight:600,color:T.text}}>{tx("addPI")}</div>
-                        <div style={w}><input type="number" value={piReal} onChange={function(e){sPiReal(Number(e.target.value));}} min={0} style={si}/><span style={{fontSize:9,color:T.dim}}>{"\u20ac"}</span></div>
-                        <div style={{textAlign:"right",fontSize:13,fontWeight:700,color:"#22863a",fontFamily:MN}}>{fmt(Math.round(piRealPension))+" \u20ac"}</div>
-                        <div style={{textAlign:"right",fontSize:13,fontWeight:600,color:T.text,fontFamily:MN}}>{fmt(piReal,2)+" \u20ac"}</div>
+                        <div style={w}><input type="number" value={piReal} onChange={function(e){sPiReal(Number(e.target.value));}} min={0} style={si}/><span style={{fontSize:9,color:T.dim}}>{tx("cur")}</span></div>
+                        <div style={{textAlign:"right",fontSize:13,fontWeight:700,color:"#22863a",fontFamily:MN}}>{fmt(Math.round(piRealPension))+" "+tx("cur")}</div>
+                        <div style={{textAlign:"right",fontSize:13,fontWeight:600,color:T.text,fontFamily:MN}}>{fmt(piReal,2)+" "+tx("cur")}</div>
                       </div>
                     </div>
                   );
@@ -688,16 +822,20 @@ export default function App(){
                 <div style={{background:T.card,borderRadius:8,padding:"22px",border:"1px solid "+T.border,marginBottom:24,boxShadow:"0 4px 18px rgba(0,0,0,0.04)"}}>
                    <div style={{fontSize:11,fontWeight:700,color:T.dim,fontFamily:FH,textTransform:"uppercase",letterSpacing:"0.04em",marginBottom:10}}>{tx("fvInvestment")}</div>
                    <div style={{fontSize:42,fontWeight:800,color:T.red,fontFamily:MN,lineHeight:1.1,marginBottom:16}}>
-                      {fmt(Math.round(fvDaily(piReal,iy/100,dur)))} <span style={{fontSize:24}}>€</span>
+                      {fmt(Math.round(fvDaily(piReal,iy/100,dur)+(calc.ulSavings||0)))} <span style={{fontSize:24}}>{tx("cur")}</span>
                    </div>
-                   <div style={{display:"flex",gap:16,borderTop:"1px solid "+T.bl,paddingTop:14}}>
+                   <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:12,borderTop:"1px solid "+T.bl,paddingTop:14}}>
                       <div>
-                         <div style={{fontSize:10,color:T.dim,fontFamily:FB,marginBottom:2}}>{tx("appreciation")}</div>
-                         <div style={{fontSize:14,fontWeight:700,color:"#22863a",fontFamily:MN}}>+{fmt(Math.max(0,Math.round(fvDaily(piReal,iy/100,dur)-piReal*dur*12)))} €</div>
+                         <div style={{fontSize:10,color:T.dim,fontFamily:FB,marginBottom:2}}>{tx("ofWhichPI")}</div>
+                         <div style={{fontSize:14,fontWeight:700,color:T.text,fontFamily:MN}}>{fmt(Math.round(fvDaily(piReal,iy/100,dur)))} {tx("cur")}</div>
                       </div>
                       <div>
-                         <div style={{fontSize:10,color:T.dim,fontFamily:FB,marginBottom:2}}>{tx("monthlyDep")}</div>
-                         <div style={{fontSize:14,fontWeight:700,color:T.text,fontFamily:MN}}>{fmt(piReal,2)} €</div>
+                         <div style={{fontSize:10,color:T.dim,fontFamily:FB,marginBottom:2}}>{tx("ofWhichUL")}</div>
+                         <div style={{fontSize:14,fontWeight:700,color:T.text,fontFamily:MN}}>{fmt(Math.round(calc.ulSavings||0))} {tx("cur")}</div>
+                      </div>
+                      <div>
+                         <div style={{fontSize:10,color:T.dim,fontFamily:FB,marginBottom:2}}>{tx("appreciation")}</div>
+                         <div style={{fontSize:14,fontWeight:700,color:"#22863a",fontFamily:MN}}>+{fmt(Math.max(0,Math.round(fvDaily(piReal,iy/100,dur)+(calc.ulSavings||0)-(piReal+(ul?Math.max(ulM*12,300)/12:0))*dur*12)))} {tx("cur")}</div>
                       </div>
                    </div>
                 </div>
@@ -719,10 +857,11 @@ export default function App(){
                   </table>
                 </Sec>
               </div>
-          </div>)}
+          </div></>)}
 
           {/* ─ MODEL POISTENIA ──────────────────────────────────── */}
-          {tab==="model"&&(<>
+          {(tab==="model"||printMode)&&(<>
+            {printMode&&<div className="print-tab-title" style={{gridColumn:"1 / -1"}}><h2 style={{fontSize:16,fontWeight:800,color:"#AB0534",margin:"20px 0 10px"}}>{tx("tabCoverModelHeader")}</h2></div>}
             <div className="center-col">
               <Sec T={T} t={tx("tabCoverHeaderRizik")} type="must">
                 {/* Credit Guard */}
@@ -745,9 +884,9 @@ export default function App(){
                   </div>
                   {ul&&(<div>
                     <div style={{display:"grid",gridTemplateColumns:"repeat(3,1fr)",gap:8,marginBottom:12,padding:"10px",background:T.input,borderRadius:6,border:"1px solid "+T.border}}>
-                      <Inp T={T} l={tx("investUL")+" "+tx("min25")} v={ulM} c={sUlM} s={"\u20ac/m"} mn={25}/>
-                      <div><div style={mL(T)}>{tx("savML")}</div><div style={{fontSize:13,fontWeight:700,color:T.text,fontFamily:MN,marginTop:4}}>{fmt(Math.round(calc.ulSavings))+" \u20ac"}</div></div>
-                      <Inp T={T} l={tx("embDeath")} v={embO!==""?embO:Math.round(calc.embDeath)} c={sEmbO} s={"\u20ac"}/>
+                      <Inp T={T} l={tx("investUL")+" "+tx("min25")} v={ulM} c={sUlM} s={tx("cur")+"/m"} mn={25}/>
+                      <div><div style={mL(T)}>{tx("savML")}</div><div style={{fontSize:13,fontWeight:700,color:T.text,fontFamily:MN,marginTop:4}}>{fmt(Math.round(calc.ulSavings))+" "+tx("cur")}</div></div>
+                      <Inp T={T} l={tx("embDeath")} v={embO!==""?embO:Math.round(calc.embDeath)} c={sEmbO} s={tx("cur")}/>
                     </div>
                     <CH T={T} L={L}/><DR T={T} l={tx("death")} sg={calc.sugULDeath} si={ulDS} sc={sUlDS} dur={ulDur} dc={sUlDur} pr={ulDeathPr} b={true}/>
                   </div>)}
@@ -775,12 +914,12 @@ export default function App(){
                 <DR T={T} l={tx("permCons")} sg={calc.sugPermDis} si={pDS} sc={sPDS} dur={pDDur} dc={sPDDur} pr={pDPr} b={true}/>
                 <DR T={T} l={tx("critIll")} sg={calc.sugCI} si={ciS} sc={sCiS} dur={ciDur} dc={sCiDur} pr={ciPr} b={true}/>
                 <div style={{marginTop:16,paddingTop:12,borderTop:"1px dashed "+T.border}}>
-                  <NR T={T} l={tx("hospital")} note={"5-300\u20ac"} si={hS} sc={sHS} pr={hPr} mx={300}/>
-                  <NR T={T} l={tx("surgical")} note={"150-5000\u20ac"} si={sS} sc={sSS} pr={sPr} mx={5000}/>
-                  <NR T={T} l={tx("fractures")} note={"500-1500\u20ac"} si={fS} sc={sFS} pr={fPr} mx={1500}/>
+                  <NR T={T} l={tx("hospital")} note={"5-300 "+tx("cur")} si={hS} sc={sHS} pr={hPr} mx={300}/>
+                  <NR T={T} l={tx("surgical")} note={"150-5000 "+tx("cur")} si={sS} sc={sSS} pr={sPr} mx={5000}/>
+                  <NR T={T} l={tx("fractures")} note={"500-1500 "+tx("cur")} si={fS} sc={sFS} pr={fPr} mx={1500}/>
                 </div>
                 <div style={{padding:"12px 0",display:"flex",gap:16,flexWrap:"wrap"}}>
-                  <Chk T={T} l={tx("telemed")+" (+15\u20ac)"} ch={telOn} c={sTelOn}/>
+                  <Chk T={T} l={tx("telemed")+" (+15 "+tx("cur")+")"} ch={telOn} c={sTelOn}/>
                   <Chk T={T} l={tx("waiver")} ch={wavOn} c={sWavOn}/>
                 </div>
                 {wavOn&&(<div style={{display:"grid",gridTemplateColumns:G5,gap:3,alignItems:"center",padding:"4px 0",borderBottom:"1px solid "+T.bl}}>

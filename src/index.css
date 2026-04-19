@@ -170,3 +170,94 @@ input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; }
   overflow: hidden;
   margin-bottom: 16px;
 }
+
+/* ═══════════════════════════════════════════════════════════
+   PRINT / PDF EXPORT
+   ═══════════════════════════════════════════════════════════ */
+
+.print-only { display: none; }
+
+@media print {
+  @page {
+    size: A4;
+    margin: 12mm;
+  }
+
+  body {
+    background: #fff !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .no-print {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  .app-container {
+    max-width: 100% !important;
+    padding: 0 !important;
+  }
+
+  .main-grid {
+    display: block !important;
+    grid-template-columns: none !important;
+  }
+
+  .main-grid > aside,
+  .center-col,
+  .right-col {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-bottom: 10mm;
+  }
+
+  .sec-card,
+  .totals-card {
+    box-shadow: none !important;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    border: 1px solid #ccc !important;
+  }
+
+  .print-tab-title h2 {
+    page-break-before: always;
+  }
+
+  .center-col > *:first-child,
+  .right-col > *:first-child {
+    page-break-inside: avoid;
+  }
+
+  .totals-card {
+    background: #8B1538 !important;
+  }
+
+  .totals-card * {
+    color: #fff !important;
+  }
+
+  button {
+    display: none !important;
+  }
+
+  .progress-track {
+    border: 1px solid #ddd;
+  }
+
+  input[type="number"],
+  input[type="text"] {
+    border: none !important;
+    background: transparent !important;
+  }
+
+  select {
+    appearance: none;
+    border: none;
+    background: transparent;
+  }
+}
