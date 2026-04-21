@@ -175,18 +175,18 @@ var I={
   carePlan:{sk:"CARE bal\u00edk",en:"CARE plan",bg:"CARE \u043f\u043b\u0430\u043d"},
   disTEMC:{sk:"Invalidita chorobou alebo \u00farazom min 51%",en:"Disability due to illness or accident min 51%",bg:"\u0418\u043d\u0432\u0430\u043b\u0438\u0434\u043d\u043e\u0441\u0442 \u043e\u0442 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0435 \u0438\u043b\u0438 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430 min 51%"},
   permDis:{sk:"Trval\u00e1 invalidita \u00farazom",en:"Permanent disability from accident",bg:"\u0422\u0440\u0430\u0439\u043d\u0430 \u0438\u043d\u0432\u0430\u043b\u0438\u0434\u043d\u043e\u0441\u0442 \u043e\u0442 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430"},
-  ci40:{sk:"40 kritick\u00fdch chor\u00f4b",en:"40 critical illnesses",bg:"40 \u043a\u0440\u0438\u0442\u0438\u0447\u043d\u0438 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0438\u044f"},
-  cancer:{sk:"Rakovina",en:"Cancer",bg:"\u0420\u0430\u043a"},insitu:{sk:"Karcin\u00f3m in situ",en:"Carcinoma in situ",bg:"\u041a\u0430\u0440\u0446\u0438\u043d\u043e\u043c in situ"},
-  teleCare:{sk:"Telemedic\u00edna",en:"Telemedicine",bg:"\u0422\u0435\u043b\u0435\u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0430"},
+  ci40:{sk:"40 kritick\u00fdch chor\u00f4b",en:"40 critical illnesses",bg:"40 \u0422\u0435\u0436\u043a\u0438 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0438\u044f"},
+  cancer:{sk:"Rakovina",en:"Cancer",bg:"\u0417\u043b\u043e\u043a\u0430\u0447\u0435\u0441\u0442\u0432\u0435\u043d\u0438 \u043d\u043e\u0432\u043e\u043e\u0431\u0440\u0430\u0437\u0443\u0432\u0430\u043d\u0438\u044f \u2013 \u0440\u0430\u043a"},insitu:{sk:"Karcin\u00f3m in situ",en:"Carcinoma in situ",bg:"\u0422\u0435\u0436\u043a\u043e \u0417\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0435 - \u041a\u0430\u0440\u0446\u0438\u043d\u043e\u043c \u0438\u043d \u0441\u0438\u0442\u0443"},
+  teleCare:{sk:"Telemedic\u00edna",en:"Telemedicine",bg:"\u0422\u0435\u043b\u0435\u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0430 / \u0412\u0442\u043e\u0440\u043e \u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0441\u043a\u043e \u043c\u043d\u0435\u043d\u0438\u0435 /"},
   accDeath:{sk:"\u00darazov\u00e1 smr\u0165",en:"Accidental death",bg:"\u0421\u043c\u044a\u0440\u0442 \u043e\u0442 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430"},
   permCons:{sk:"Trval\u00e9 n\u00e1sledky \u00farazu",en:"Permanent consequences of accident",bg:"\u0422\u0440\u0430\u0439\u043d\u0438 \u043f\u043e\u0441\u043b\u0435\u0434\u0438\u0446\u0438 \u043e\u0442 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430"},
   critIll:{sk:"Kritick\u00e9 choroby",en:"Critical illness",bg:"\u041a\u0440\u0438\u0442\u0438\u0447\u043d\u0438 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0438\u044f"},
   hospital:{sk:"Hospital cash",en:"Hospital cash",bg:"Hospital cash"},surgical:{sk:"Surgical",en:"Surgical",bg:"Surgical"},
   fractures:{sk:"Zlomeniny a pop\u00e1leniny",en:"Fractures and burns",bg:"\u0421\u0447\u0443\u043f\u0432\u0430\u043d\u0438\u044f \u0438 \u0438\u0437\u0433\u0430\u0440\u044f\u043d\u0438\u044f"},
-  telemed:{sk:"Telemedic\u00edna",en:"Telemedicine",bg:"\u0422\u0435\u043b\u0435\u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0430"},
-  waiver:{sk:"Waiver",en:"Waiver",bg:"Waiver"},
-  cur:{sk:"\u20ac",en:"\u20ac",bg:"\u043b\u0432."},
-  totalYearly:{sk:"Celkov\u00e9 ro\u010dn\u00e9 poistn\u00e9",en:"Total yearly premium",bg:"\u041e\u0431\u0449\u0430 \u0433\u043e\u0434\u0438\u0448\u043d\u0430 \u043f\u0440\u0435\u043c\u0438\u044f"},
+  telemed:{sk:"Telemedic\u00edna",en:"Telemedicine",bg:"\u0422\u0435\u043b\u0435\u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0430 / \u0412\u0442\u043e\u0440\u043e \u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0441\u043a\u043e \u043c\u043d\u0435\u043d\u0438\u0435 /"},
+  waiver:{sk:"Waiver",en:"Waiver",bg:"\u041e\u0442\u043a\u0430\u0437 \u043e\u0442 \u043f\u0440\u0435\u043c\u0438\u044f"},
+  cur:{sk:"\u20ac",en:"\u20ac",bg:"\u20ac"},
+  totalYearly:{sk:"Celkov\u00e9 ro\u010dn\u00e9 poistn\u00e9",en:"Total yearly premium",bg:"\u041e\u0431\u0449\u0430 \u0431\u0440\u0443\u0442\u043d\u0430 \u0433\u043e\u0434\u0438\u0448\u043d\u0430 \u043f\u0440\u0435\u043c\u0438\u044f"},
   riskPart:{sk:"Rizikov\u00e1 \u010das\u0165",en:"Risk part",bg:"\u0420\u0438\u0441\u043a\u043e\u0432\u0430 \u0447\u0430\u0441\u0442"},
   investInc:{sk:"Investi\u010dn\u00e1 \u010das\u0165 z pr\u00edjmu",en:"Investment part of income",bg:"\u0418\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u043e\u043d\u043d\u0430 \u0447\u0430\u0441\u0442 \u043e\u0442 \u0434\u043e\u0445\u043e\u0434\u0430"},riskInc:{sk:"Rizikov\u00e1 \u010das\u0165 z pr\u00edjmu",en:"Risk part of income",bg:"\u0420\u0438\u0441\u043a\u043e\u0432\u0430 \u0447\u0430\u0441\u0442 \u043e\u0442 \u0434\u043e\u0445\u043e\u0434\u0430"},
   incomeLoss:{sk:"Strata pr\u00edjmu",en:"Income loss",bg:"\u0417\u0430\u0433\u0443\u0431\u0430 \u043d\u0430 \u0434\u043e\u0445\u043e\u0434"},
@@ -203,7 +203,7 @@ var I={
   yearlyOverview:{sk:"Ro\u010dn\u00fd preh\u013ead",en:"Yearly overview",bg:"\u0413\u043e\u0434\u0438\u0448\u0435\u043d \u043f\u0440\u0435\u0433\u043b\u0435\u0434"},
   year:{sk:"Rok",en:"Year",bg:"\u0413\u043e\u0434\u0438\u043d\u0430"},depTotal:{sk:"Vklady",en:"Deposits",bg:"\u0412\u043d\u043e\u0441\u043a\u0438"},profit:{sk:"Zisk",en:"Profit",bg:"\u041f\u0435\u0447\u0430\u043b\u0431\u0430"},
   goal:{sk:"Cie\u013e",en:"Goal",bg:"\u0426\u0435\u043b"},
-  colSugg:{sk:"Navrhovan\u00e1 suma",en:"Suggested sum",bg:"\u041f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0430 \u0441\u0443\u043c\u0430"},colSum:{sk:"Poistn\u00e1 suma",en:"Sum insured",bg:"\u0417\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u0430\u043d\u0430 \u0441\u0443\u043c\u0430"},colYrs:{sk:"Roky",en:"Years",bg:"\u0413\u043e\u0434\u0438\u043d\u0438"},colPrem:{sk:"Poistn\u00e9 za rok",en:"Premium per year",bg:"\u041f\u0440\u0435\u043c\u0438\u044f \u0437\u0430 \u0433\u043e\u0434\u0438\u043d\u0430"},
+  colSugg:{sk:"Navrhovan\u00e1 suma",en:"Suggested sum",bg:"\u041f\u0440\u0435\u0434\u043b\u043e\u0436\u0435\u043d\u0430 \u0441\u0443\u043c\u0430"},colSum:{sk:"Poistn\u00e1 suma",en:"Sum insured",bg:"\u0417\u0430\u0441\u0442\u0440\u0430\u0445\u043e\u0432\u0430\u043d\u0430 \u0441\u0443\u043c\u0430"},colYrs:{sk:"Roky",en:"Years",bg:"\u0413\u043e\u0434\u0438\u043d\u0438"},colPrem:{sk:"Poistn\u00e9 za rok",en:"Premium per year",bg:"Нетна Годишна премия"},
   light:{sk:"Svetl\u00e1",en:"Light",bg:"\u0421\u0432\u0435\u0442\u043b\u0430"},dark:{sk:"Tmav\u00e1",en:"Dark",bg:"\u0422\u044a\u043c\u043d\u0430"},
   tabIncomeSecHeader: {sk:"Anal\u00fdza zabezpe\u010denia pr\u00edjmu", en:"Income protection analysis", bg:"\u0410\u043d\u0430\u043b\u0438\u0437 \u043d\u0430 \u0437\u0430\u0449\u0438\u0442\u0430\u0442\u0430 \u043d\u0430 \u0434\u043e\u0445\u043e\u0434\u0430"},
   tabInvestCapHeader: {sk:"Invest\u00edcia a budovanie kapit\u00e1lu", en:"Investment and capital building", bg:"\u0418\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u0438 \u0438 \u043d\u0430\u0442\u0440\u0443\u043f\u0432\u0430\u043d\u0435 \u043d\u0430 \u043a\u0430\u043f\u0438\u0442\u0430\u043b"},
@@ -225,7 +225,7 @@ var I={
   fvInvestment: {sk:"Bud\u00faca hodnota invest\u00edcie", en:"Future investment value", bg:"\u0411\u044a\u0434\u0435\u0449\u0430 \u0441\u0442\u043e\u0439\u043d\u043e\u0441\u0442 \u043d\u0430 \u0438\u043d\u0432\u0435\u0441\u0442\u0438\u0446\u0438\u044f\u0442\u0430"},
   tabCoverHeaderRizik: {sk:"Krytie riz\u00edk a \u00faveru", en:"Coverage of risks and loan", bg:"\u041f\u043e\u043a\u0440\u0438\u0442\u0438\u0435 \u043d\u0430 \u0440\u0438\u0441\u043a\u043e\u0432\u0435 \u0438 \u043a\u0440\u0435\u0434\u0438\u0442\u0438"},
   tabCoverHeaderMetlifeHlavne: {sk:"Metlife Hlavn\u00e9 krytie", en:"Metlife Main Coverage", bg:"\u041e\u0441\u043d\u043e\u0432\u043d\u043e \u043f\u043e\u043a\u0440\u0438\u0442\u0438\u0435 Metlife"},
-  tabCoverHeaderDoplnkSluzby: {sk:"Doplnkov\u00e9 a flexibiln\u00e9 pripoistenia", en:"Additional and flexible riders", bg:"\u0414\u043e\u043f\u044a\u043b\u043d\u0438\u0442\u0435\u043b\u043d\u0438 \u0438 \u0433\u044a\u0432\u043a\u0430\u0432\u0438 \u043f\u043e\u043a\u0440\u0438\u0442\u0438\u044f"},
+  tabCoverHeaderDoplnkSluzby: {sk:"Doplnkov\u00e9 a flexibiln\u00e9 pripoistenia", en:"Additional and flexible riders", bg:"Допълнителни застрахователни договори"},
   cgTitle: {sk:"Metlife Credit Guard", en:"Metlife Credit Guard", bg:"Metlife Credit Guard"},
   careTitle: {sk:"Metlife CARE", en:"Metlife CARE", bg:"Metlife CARE"},
   yes: {sk:"\u00e1no", en:"yes", bg:"\u0434\u0430"},
@@ -480,11 +480,8 @@ export default function App(){
   var cgRate=lr(cgDD?DD:DOT,age,cgD);var cgPr=cg?(cgS/100000)*cgRate*12:0;
   var ulYr=calc.ulYearly;
   /* UL Death uses Rider table if UL on, Basic if off */
-  var ulDeathRate=ul?lr(DD,age,ulDur):0;
-  var ulDeathPr=ul?(ulDS/1000)*(ulDeathRate/100)*12:0;
-  /* Recalc: Excel F29 = VLOOKUP for rider rate * sum/1000 */
-  /* Actually the DD table values are per 100000. So: rate * sum/100000 * 12 */
-  ulDeathPr=ul?(ulDS/100000)*lr(DD,age,ulDur)*12:0;
+  var ulDeathRate=lr(DD,age,ulDur);
+  var ulDeathPr=(ulDS/100000)*ulDeathRate*12;
 
   var dR=rateAt(DIS_R,age),ciRR=rateAt(CI_R,age),caRR=rateAt(CA_R,age),inRR=rateAt(IN_R,age);
   var cDisPr=careActive?careVals[0]/1000*dR:0;
@@ -888,14 +885,14 @@ export default function App(){
                      <span style={{fontSize:13,fontWeight:700,color:T.text,fontFamily:FH}}>{tx("tabCoverHeaderMetlifeHlavne")}</span>
                      <Chk T={T} l={tx("withUL")} ch={ul} c={sUl}/>
                   </div>
-                  {ul&&(<div>
+                  {ul&&(
                     <div style={{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(130px,1fr))",gap:8,marginBottom:12,padding:"10px",background:T.input,borderRadius:6,border:"1px solid "+T.border}}>
                       <Inp T={T} l={tx("investUL")+" "+tx("min25")} v={ulM} c={sUlM} s={tx("cur")+"/m"} mn={25}/>
                       <div><div style={mL(T)}>{tx("savML")}</div><div style={{fontSize:13,fontWeight:700,color:T.text,fontFamily:MN,marginTop:4}}>{fmt(Math.round(calc.ulSavings))+" "+tx("cur")}</div></div>
                       <Inp T={T} l={tx("embDeath")} v={embO!==""?embO:Math.round(calc.embDeath)} c={sEmbO} s={tx("cur")}/>
                     </div>
-                    <div className="table-responsive"><div style={{minWidth:"450px"}}><CH T={T} L={L}/><DR T={T} l={tx("death")} sg={calc.sugULDeath} si={ulDS} sc={sUlDS} dur={ulDur} dc={sUlDur} pr={ulDeathPr} b={true}/></div></div>
-                  </div>)}
+                  )}
+                  <div className="table-responsive"><div style={{minWidth:"450px"}}><CH T={T} L={L}/><DR T={T} l={tx("death")} sg={calc.sugULDeath} si={ulDS} sc={sUlDS} dur={ulDur} dc={sUlDur} pr={ulDeathPr} b={true}/></div></div>
                 </div>
 
                 {/* CARE */}
