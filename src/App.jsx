@@ -180,7 +180,7 @@ var I={
   teleCare:{sk:"Telemedic\u00edna",en:"Telemedicine",bg:"\u0422\u0435\u043b\u0435\u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0430 / \u0412\u0442\u043e\u0440\u043e \u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0441\u043a\u043e \u043c\u043d\u0435\u043d\u0438\u0435 /"},
   accDeath:{sk:"\u00darazov\u00e1 smr\u0165",en:"Accidental death",bg:"\u0421\u043c\u044a\u0440\u0442 \u043e\u0442 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430"},
   permCons:{sk:"Trval\u00e9 n\u00e1sledky \u00farazu",en:"Permanent consequences of accident",bg:"\u0422\u0440\u0430\u0439\u043d\u0438 \u043f\u043e\u0441\u043b\u0435\u0434\u0438\u0446\u0438 \u043e\u0442 \u0437\u043b\u043e\u043f\u043e\u043b\u0443\u043a\u0430"},
-  critIll:{sk:"Kritick\u00e9 choroby",en:"Critical illness",bg:"\u041a\u0440\u0438\u0442\u0438\u0447\u043d\u0438 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0438\u044f"},
+  critIll:{sk:"Kritick\u00e9 choroby",en:"Critical illness",bg:"\u041a\u0440\u0438\u0442\u0438\u0447\u043d\u0438 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0438\u044f"},\n  ciNote:{sk:"*iba v rizikovom produkte a obsahuje iba 32 kritick\u00fdch chor\u00f4b",en:"*only in risk product and contains only 32 critical illnesses",bg:"*\u0441\u0430\u043c\u043e \u0432 \u0440\u0438\u0441\u043a\u043e\u0432 \u043f\u0440\u043e\u0434\u0443\u043a\u0442 \u0438 \u0441\u044a\u0434\u044a\u0440\u0436\u0430 \u0441\u0430\u043c\u043e 32 \u043a\u0440\u0438\u0442\u0438\u0447\u043d\u0438 \u0437\u0430\u0431\u043e\u043b\u044f\u0432\u0430\u043d\u0438\u044f"},
   hospital:{sk:"Hospital cash",en:"Hospital cash",bg:"Hospital cash"},surgical:{sk:"Surgical",en:"Surgical",bg:"Surgical"},
   fractures:{sk:"Zlomeniny a pop\u00e1leniny",en:"Fractures and burns",bg:"\u0421\u0447\u0443\u043f\u0432\u0430\u043d\u0438\u044f \u0438 \u0438\u0437\u0433\u0430\u0440\u044f\u043d\u0438\u044f"},
   telemed:{sk:"Telemedic\u00edna",en:"Telemedicine",bg:"\u0422\u0435\u043b\u0435\u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0430 / \u0412\u0442\u043e\u0440\u043e \u043c\u0435\u0434\u0438\u0446\u0438\u043d\u0441\u043a\u043e \u043c\u043d\u0435\u043d\u0438\u0435 /"},
@@ -953,6 +953,7 @@ export default function App(){
                 <DR T={T} l={tx("accDeath")} si={aDS} sc={sADS} dur={aDDur} dc={sADDur} pr={aDPr} b={true}/>
                 <DR T={T} l={tx("permCons")} sg={calc.sugPermDis} si={pDS} sc={sPDS} dur={pDDur} dc={sPDDur} pr={pDPr} b={true}/>
                 <DR T={T} l={tx("critIll")} sg={calc.sugCI} si={ciS} sc={sCiS} dur={ciDur} dc={sCiDur} pr={ciPr} b={true}/>
+                {!ul && <div style={{fontSize:10, fontStyle:"italic", color:T.dim, fontFamily:FB, marginTop:4}}>{tx("ciNote")}</div>}
                 <div style={{margin:"16px 0",paddingTop:12,borderTop:"1px dashed "+T.border}}>
                   <NR T={T} l={tx("hospital")} note={"5-300 "+tx("cur")} si={hS} sc={sHS} pr={hPr} mx={300}/>
                   <NR T={T} l={tx("surgical")} note={"150-5000 "+tx("cur")} si={sS} sc={sSS} pr={sPr} mx={5000}/>
