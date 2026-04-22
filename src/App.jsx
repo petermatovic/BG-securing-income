@@ -248,7 +248,9 @@ var I={
   exportPDF: {sk:"Export PDF", en:"Export PDF", bg:"\u0415\u043a\u0441\u043f\u043e\u0440\u0442 PDF"},
   date: {sk:"D\u00e1tum", en:"Date", bg:"\u0414\u0430\u0442\u0430"},
   export: {sk:"Export JSON", en:"Export JSON", bg:"\u0415\u043a\u0441\u043f\u043e\u0440\u0442 JSON"},
-  import: {sk:"Import JSON", en:"Import JSON", bg:"\u0412\u043d\u043e\u0441 JSON"}
+  import: {sk:"Import JSON", en:"Import JSON", bg:"\u0412\u043d\u043e\u0441 JSON"},
+  vzorova: {sk:"Vzorov\u00e1", en:"Sample", bg:"\u041e\u0431\u0440\u0430\u0437\u0435\u0446"},
+  novyPlan: {sk:"Nov\u00fd pl\u00e1n", en:"New Plan", bg:"\u041d\u043e\u0432 \u043f\u043b\u0430\u043d"}
 };
 var GLang = "bg";
 function t(k,l){return(I[k]&&I[k][l||GLang])||I[k].sk||k;}
@@ -462,6 +464,30 @@ export default function App(){
     e.target.value = null;
   }
 
+  function handleSamplePlan() {
+    sBr(2550); sNe(2000); sAge(25); sIy(8); sPy(4); sPyr(20);
+    sSt("SINGLE"); sRk(1); sLoan(0); sDur(30);
+    sCg(true); sCgDD(true); sCgS(241000); sCgD(30);
+    sUl(true); sUlM(25); sUlDS(4000); sUlDur(30);
+    sCp("Silver plan"); sCDiD(30);
+    sADS(0); sADDur(30); sPDS(20000); sPDDur(30);
+    sCiS(0); sCiDur(5); sHS(0); sSS(0); sFS(0);
+    sTelOn(true); sWavOn(false); sPiReal(93);
+    setClientName(""); setAdvisorName("");
+  }
+
+  function handleNewPlan() {
+    sBr(0); sNe(0); sAge(25); sIy(8); sPy(4); sPyr(20);
+    sSt("SINGLE"); sRk(1); sLoan(0); sDur(30);
+    sCg(false); sCgDD(false); sCgS(0); sCgD(30);
+    sUl(false); sUlM(0); sUlDS(0); sUlDur(30);
+    sCp("not included"); sCDiD(30);
+    sADS(0); sADDur(30); sPDS(0); sPDDur(30);
+    sCiS(0); sCiDur(5); sHS(0); sSS(0); sFS(0);
+    sTelOn(false); sWavOn(false); sPiReal(0);
+    setClientName(""); setAdvisorName("");
+  }
+
   var _embO=_(""),embO=_embO[0],sEmbO=_embO[1];
   var _showRD=_(false),showRD=_showRD[0],sShowRD=_showRD[1];
 
@@ -548,6 +574,15 @@ export default function App(){
           </div>
 
           <div className="no-print header-controls" style={{display:"flex",alignItems:"center",gap:6}}>
+            <button className="lang-btn" onClick={handleSamplePlan} style={{...btnS(false), display: "flex", alignItems: "center", gap: 4}}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8" /><path d="M3 3v5h5" /></svg>
+              {tx("vzorova")}
+            </button>
+            <button className="lang-btn" onClick={handleNewPlan} style={{...btnS(false), display: "flex", alignItems: "center", gap: 4}}>
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6"/></svg>
+              {tx("novyPlan")}
+            </button>
+            <div style={{width:1,height:18,background:T.border,margin:"0 4px"}}></div>
             {["bg","sk","en"].map(function(lg){return <button key={lg} className="lang-btn" onClick={function(){setLang(lg);}} style={btnS(lang===lg)}>{lg.toUpperCase()}</button>;})}
             <div style={{width:1,height:18,background:T.border,margin:"0 4px"}}></div>
             <button className="lang-btn" onClick={function(){setDark(!dark);}} style={btnS(false)}>{dark?tx("light"):tx("dark")}</button>
