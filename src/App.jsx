@@ -507,7 +507,7 @@ export default function App(){
   var cgRate=lr(cgDD?DD:DOT,age,cgD);var cgPr=cg?(cgS/100000)*cgRate*12:0;
   var ulYr=calc.ulYearly;
   /* UL Death uses Rider table if UL on, Basic if off */
-  var ulDeathRate=lr(DD,age,ulDur);
+  var ulDeathRate=lr(ul?DD:DOT,age,ulDur);
   var ulDeathPr=(ulDS/100000)*ulDeathRate*12;
 
   var dR=rateAt(DIS_R,age),ciRR=rateAt(CI_R,age),caRR=rateAt(CA_R,age),inRR=rateAt(IN_R,age);
@@ -532,7 +532,7 @@ export default function App(){
   var pensionWithPlan = (calc.pen.repl || 0) + monthlyRentFromPlan;
 
   var riskSum=cgPr+ulDeathPr+cDisPr+cPDPr+cCIPr+cCaPr+cInPr+cTelPr+aDPr+pDPr+ciPr+hPr+sPr+fPr+telPr;
-  var wvPr=wavOn?safe(riskSum*WRT[rk]):0;
+  var wvPr=wavOn?safe((riskSum-cgPr)*WRT[rk]):0;
   /* Fee: 15 if UL, 13 if not + 5 if CG */
   var fee=(ul?15:13)+(cg?5:0);
   var rP=riskSum+wvPr;
